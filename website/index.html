@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5G SliceGuard — Intrusion Detection & Response for Virtualized Network Slices</title>
+    <meta name="description" content="Real-time intrusion detection and automated response system for 5G virtualized network slices. Threat simulation, anomaly analysis, and automated quarantine.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ========== NAVBAR ========== -->
+<nav class="navbar" id="navbar">
+    <div class="container">
+        <a href="#hero" class="nav-logo">
+            <div class="logo-icon"><i class="fas fa-shield-halved"></i></div>
+            <span>5G SliceGuard</span>
+        </a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#about">About</a></li>
+            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#simulator">Defense Lab</a></li>
+            <li><a href="#attacks">Threat Landscape</a></li>
+            <li><a href="#detection">Defense Engine</a></li>
+            <li><a href="#comparison">Protocols</a></li>
+            <li><a href="#simulator" class="nav-cta">Launch Demo</a></li>
+        </ul>
+        <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+
+<!-- ========== HERO ========== -->
+<section class="hero" id="hero">
+    <canvas class="hero-bg-canvas" id="heroBgCanvas"></canvas>
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="pulse-dot"></span>
+                5G Defense System
+            </div>
+            <h1>
+                5G SliceGuard<br>
+                <span class="gradient-text">Intrusion Detection</span><br>
+                & Response
+            </h1>
+            <p class="hero-description">
+                A real-time intrusion detection and automated response system for 5G virtualized network slices. 
+                Detect cross-slice threats, analyze anomalies, and trigger automated quarantine — before damage spreads.
+            </p>
+            <div class="hero-actions">
+                <a href="#simulator" class="btn-primary">
+                    <i class="fas fa-shield-halved"></i> Enter Defense Lab
+                </a>
+                <a href="#about" class="btn-outline">
+                    <i class="fas fa-book-open"></i> Learn More
+                </a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-slice-preview">
+                <div class="slice-ring"><span class="ring-dot"></span></div>
+                <div class="slice-ring"><span class="ring-dot"></span></div>
+                <div class="slice-ring"><span class="ring-dot"></span></div>
+                <div class="hero-center-badge">5G</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== ABOUT – WHAT IS NETWORK SLICING ========== -->
+<section class="about-section" id="about">
+    <div class="container">
+        <div class="about-header reveal">
+            <span class="section-label">Foundation</span>
+            <h2 class="section-title">5G Network Slicing & Why It Needs Guarding</h2>
+            <p class="section-subtitle">
+                5G network slicing allows operators to create multiple virtual networks (slices) 
+                on a single shared physical infrastructure. Each slice is an <strong>isolated, end-to-end virtual network</strong> 
+                tailored for a specific use case — with its own bandwidth, latency guarantees, and security policies.
+                Think of it as <em>separate lanes on a highway</em>: same road, but each lane has different speed limits and rules.
+            </p>
+        </div>
+
+        <!-- Security Callout -->
+        <div class="glass-card reveal" style="margin-bottom: 40px; border-left: 3px solid var(--accent); padding: 24px 28px;">
+            <h4 style="color: var(--accent); margin-bottom: 8px; font-size: 0.95rem;"><i class="fas fa-lightbulb"></i> Why This Matters for Security</h4>
+            <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.7; margin: 0;">
+                An IoT slice (mMTC) might have thousands of easily-compromised sensors. A medical slice (URLLC) handles 
+                remote surgery with <strong>sub-1ms latency requirements</strong>. <strong style="color: var(--danger);">If an attacker compromises an IoT device and jumps to the URLLC slice, 
+                lives are at risk.</strong> That's why slice isolation — and SliceGuard — is critical.
+            </p>
+        </div>
+
+        <div class="slices-grid">
+            <!-- eMBB Card -->
+            <div class="slice-card embb reveal">
+                <div class="slice-icon"><i class="fas fa-video"></i></div>
+                <span class="slice-tag">eMBB</span>
+                <h3>Enhanced Mobile Broadband</h3>
+                <p>High-bandwidth applications like 4K/8K streaming, virtual reality, and cloud gaming requiring massive throughput.</p>
+                <div class="slice-specs">
+                    <div class="spec-row">
+                        <span class="spec-label">Bandwidth</span>
+                        <span class="spec-value" style="color: var(--embb-color)">20 Gbps</span>
+                    </div>
+                    <div class="spec-row">
+                        <span class="spec-label">Latency</span>
+                        <span class="spec-value">4 ms</span>
+                    </div>
+                    <div class="spec-row">
+                        <span class="spec-label">Priority</span>
+                        <span class="spec-value">Medium</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- URLLC Card -->
+            <div class="slice-card urllc reveal">
+                <div class="slice-icon"><i class="fas fa-car"></i></div>
+                <span class="slice-tag">URLLC</span>
+                <h3>Ultra-Reliable Low Latency</h3>
+                <p>Mission-critical applications like autonomous driving, remote surgery, and industrial automation requiring ultra-low latency.</p>
+                <div class="slice-specs">
+                    <div class="spec-row">
+                        <span class="spec-label">Bandwidth</span>
+                        <span class="spec-value">10 Gbps</span>
+                    </div>
+                    <div class="spec-row">
+                        <span class="spec-label">Latency</span>
+                        <span class="spec-value" style="color: var(--urllc-color)">1 ms</span>
+                    </div>
+                    <div class="spec-row">
+                        <span class="spec-label">Priority</span>
+                        <span class="spec-value" style="color: var(--urllc-color)">Critical</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- mMTC Card -->
+            <div class="slice-card mmtc reveal">
+                <div class="slice-icon"><i class="fas fa-microchip"></i></div>
+                <span class="slice-tag">mMTC</span>
+                <h3>Massive Machine-Type Comm.</h3>
+                <p>IoT deployments with millions of sensors and devices — smart cities, agriculture monitoring, and environmental tracking.</p>
+                <div class="slice-specs">
+                    <div class="spec-row">
+                        <span class="spec-label">Devices/km²</span>
+                        <span class="spec-value" style="color: var(--mmtc-color)">1M+</span>
+                    </div>
+                    <div class="spec-row">
+                        <span class="spec-label">Latency</span>
+                        <span class="spec-value">10 ms</span>
+                    </div>
+                    <div class="spec-row">
+                        <span class="spec-label">Power</span>
+                        <span class="spec-value" style="color: var(--mmtc-color)">Ultra-Low</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== ARCHITECTURE ========== -->
+<section class="architecture-section" id="architecture">
+    <div class="container">
+        <div class="reveal">
+            <span class="section-label">Architecture</span>
+            <h2 class="section-title">5G Slicing Architecture</h2>
+            <p class="section-subtitle">
+                Network slicing operates across all layers of the 5G architecture — from the Radio Access Network 
+                through the Core Network, managed by the NSSF (Network Slice Selection Function).
+            </p>
+        </div>
+
+        <div class="arch-diagram reveal">
+            <div class="arch-layers">
+                <!-- Application Layer -->
+                <div class="arch-layer">
+                    <div class="arch-layer-label">Application Layer</div>
+                    <div class="arch-layer-content">
+                        <div class="arch-node embb-node"><i class="fas fa-film"></i> <div><strong>VR / Streaming</strong><small class="arch-desc">4K video, cloud gaming, AR</small></div></div>
+                        <div class="arch-node urllc-node"><i class="fas fa-robot"></i> <div><strong>Autonomous Systems</strong><small class="arch-desc">Self-driving, remote surgery</small></div></div>
+                        <div class="arch-node mmtc-node"><i class="fas fa-temperature-half"></i> <div><strong>IoT Sensors</strong><small class="arch-desc">Smart city, agriculture, env.</small></div></div>
+                    </div>
+                </div>
+
+                <div class="arch-connector"><i class="fas fa-arrows-down-to-line"></i> <span style="margin-left:8px; font-style:italic;">S-NSSAI routing</span></div>
+
+                <!-- Slice Management -->
+                <div class="arch-layer">
+                    <div class="arch-layer-label">Slice Management</div>
+                    <div class="arch-layer-content">
+                        <div class="arch-node"><i class="fas fa-network-wired"></i> <div><strong>NSSF</strong><small class="arch-desc">Network Slice Selection Function — decides which slice a device connects to</small></div></div>
+                        <div class="arch-node"><i class="fas fa-shield-halved"></i> <div><strong>NSSAAF</strong><small class="arch-desc">Slice Auth & Authorization — verifies per-slice access rights</small></div></div>
+                        <div class="arch-node"><i class="fas fa-gauge-high"></i> <div><strong>NSSMF</strong><small class="arch-desc">Slice Subnet Mgmt — monitors & manages each slice's health</small></div></div>
+                    </div>
+                </div>
+
+                <div class="arch-connector"><i class="fas fa-arrows-down-to-line"></i> <span style="margin-left:8px; font-style:italic;">Control plane</span></div>
+
+                <!-- Core Network -->
+                <div class="arch-layer">
+                    <div class="arch-layer-label">5G Core (5GC)</div>
+                    <div class="arch-layer-content">
+                        <div class="arch-node"><i class="fas fa-server"></i> <div><strong>AMF</strong><small class="arch-desc">Access & Mobility Mgmt — device registration & handovers</small></div></div>
+                        <div class="arch-node"><i class="fas fa-database"></i> <div><strong>UDM</strong><small class="arch-desc">Unified Data Mgmt — subscriber profiles & slice assignments</small></div></div>
+                        <div class="arch-node"><i class="fas fa-route"></i> <div><strong>SMF</strong><small class="arch-desc">Session Mgmt — manages data sessions within each slice</small></div></div>
+                        <div class="arch-node"><i class="fas fa-globe"></i> <div><strong>UPF</strong><small class="arch-desc">User Plane Function — forwards actual data packets (shared = risk!)</small></div></div>
+                    </div>
+                </div>
+
+                <div class="arch-connector"><i class="fas fa-arrows-down-to-line"></i> <span style="margin-left:8px; font-style:italic;">Fronthaul / midhaul</span></div>
+
+                <!-- RAN -->
+                <div class="arch-layer">
+                    <div class="arch-layer-label">Radio Access (RAN)</div>
+                    <div class="arch-layer-content">
+                        <div class="arch-node"><i class="fas fa-broadcast-tower"></i> <div><strong>gNodeB (gNB)</strong><small class="arch-desc">5G Base Station — the radio tower devices connect to (replaces 4G's eNodeB)</small></div></div>
+                        <div class="arch-node"><i class="fas fa-tower-cell"></i> <div><strong>gNodeB (gNB)</strong><small class="arch-desc">Multiple gNBs provide coverage and handle capacity across areas</small></div></div>
+                        <div class="arch-node"><i class="fas fa-satellite-dish"></i> <div><strong>gNodeB (gNB)</strong><small class="arch-desc">Each gNB can serve multiple slices simultaneously over air</small></div></div>
+                    </div>
+                </div>
+
+                <div class="arch-connector"><i class="fas fa-arrows-down-to-line"></i> <span style="margin-left:8px; font-style:italic;">NR air interface</span></div>
+
+                <!-- UE -->
+                <div class="arch-layer">
+                    <div class="arch-layer-label">User Equipment</div>
+                    <div class="arch-layer-content">
+                        <div class="arch-node embb-node"><i class="fas fa-mobile-screen"></i> <div><strong>Smartphones</strong><small class="arch-desc">Request eMBB slice via S-NSSAI in registration</small></div></div>
+                        <div class="arch-node urllc-node"><i class="fas fa-car-side"></i> <div><strong>Vehicles</strong><small class="arch-desc">Require guaranteed URLLC slice for safety-critical comms</small></div></div>
+                        <div class="arch-node mmtc-node"><i class="fas fa-microchip"></i> <div><strong>IoT Devices</strong><small class="arch-desc">Low-power devices on mMTC slice, often low security</small></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- S-NSSAI Explainer -->
+            <div style="margin-top: 24px; padding: 16px 20px; background: rgba(123,97,255,0.06); border: 1px solid rgba(123,97,255,0.15); border-radius: 12px;">
+                <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem; line-height: 1.7;">
+                    <strong style="color: var(--accent);"><i class="fas fa-key"></i> S-NSSAI</strong> (Single Network Slice Selection Assistance Information) — 
+                    Each device specifies which slice it needs using <strong>SST</strong> (Slice Type: 1=eMBB, 2=URLLC, 3=mMTC) and an optional 
+                    <strong>SD</strong> (Slice Differentiator). The NSSF routes the device to the correct virtual network based on this identifier.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== SIMULATOR ========== -->
+<section class="simulator-section" id="simulator">
+    <div class="container">
+        <div class="simulator-header reveal">
+            <span class="section-label">Defense Lab</span>
+            <h2 class="section-title">Threat Simulation & Response Testbed</h2>
+            <p class="section-subtitle" style="margin: 0 auto;">
+                Observe network slices under normal operation, inject controlled threats to stress-test 
+                isolation boundaries, and validate the IDS engine's detection and automated response capabilities.
+            </p>
+        </div>
+
+        <div class="simulator-wrapper">
+            <!-- Canvas Area -->
+            <div class="sim-canvas-container" id="simCanvasContainer">
+                <div class="sim-status-bar">
+                    <div class="sim-status-badge idle" id="simStatusBadge">
+                        <i class="fas fa-circle"></i> <span>IDLE</span>
+                    </div>
+                    <div class="sim-timer" id="simTimer">00:00</div>
+                </div>
+                <canvas id="simCanvas"></canvas>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="sim-controls">
+                <!-- Playback -->
+                <div class="control-card">
+                    <h4><i class="fas fa-gamepad"></i> Controls</h4>
+                    <div class="control-btns">
+                        <button class="sim-btn" id="btnStart" onclick="simulator.start()">
+                            <i class="fas fa-play"></i> Start
+                        </button>
+                        <button class="sim-btn" id="btnStop" onclick="simulator.stop()" disabled>
+                            <i class="fas fa-pause"></i> Stop
+                        </button>
+                        <button class="sim-btn" id="btnReset" onclick="simulator.reset()">
+                            <i class="fas fa-rotate-right"></i> Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Attack Options -->
+                <div class="control-card">
+                    <h4><i class="fas fa-flask"></i> Threat Injection</h4>
+                    <div class="attack-types" id="attackTypes">
+                        <label class="attack-option selected">
+                            <input type="radio" name="attackType" value="resource_theft" checked>
+                            <div>
+                                <span class="attack-name">Resource Theft</span>
+                                <span class="attack-desc">Steal bandwidth from adjacent slices</span>
+                            </div>
+                        </label>
+                        <label class="attack-option">
+                            <input type="radio" name="attackType" value="data_injection">
+                            <div>
+                                <span class="attack-name">Data Injection</span>
+                                <span class="attack-desc">Inject packets across slice boundary</span>
+                            </div>
+                        </label>
+                        <label class="attack-option">
+                            <input type="radio" name="attackType" value="side_channel">
+                            <div>
+                                <span class="attack-name">Side-Channel</span>
+                                <span class="attack-desc">Infer data via shared resources</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="control-btns" style="margin-top: 12px;">
+                        <button class="sim-btn danger" id="btnAttack" onclick="simulator.launchAttack()" disabled>
+                            <i class="fas fa-flask"></i> Inject Threat
+                        </button>
+                        <button class="sim-btn success" id="btnDetect" onclick="simulator.runDetection()" disabled>
+                            <i class="fas fa-shield-halved"></i> Engage IDS
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Metrics -->
+                <div class="control-card">
+                    <h4><i class="fas fa-chart-bar"></i> Slice Metrics</h4>
+                    <div class="slice-metrics" id="sliceMetrics">
+                        <div class="metric-row">
+                            <span class="metric-label"><span class="metric-dot" style="background:var(--embb-color)"></span> eMBB</span>
+                            <span class="metric-value" id="metricEmbb" style="color:var(--embb-color)">— Mbps</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label"><span class="metric-dot" style="background:var(--urllc-color)"></span> URLLC</span>
+                            <span class="metric-value" id="metricUrllc" style="color:var(--urllc-color)">— ms</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label"><span class="metric-dot" style="background:var(--mmtc-color)"></span> mMTC</span>
+                            <span class="metric-value" id="metricMmtc" style="color:var(--mmtc-color)">— dev</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label"><span class="metric-dot" style="background:var(--danger)"></span> Anomaly</span>
+                            <span class="metric-value" id="metricAnomaly" style="color:var(--danger)">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alert Log -->
+                <div class="control-card" style="flex:1; min-height:120px;">
+                    <h4><i class="fas fa-bell"></i> Alert Log</h4>
+                    <div class="alert-log" id="alertLog">
+                        <div class="alert-entry" style="color: var(--text-muted); border-color: var(--border-glass); background: transparent;">
+                            <i class="fas fa-info-circle"></i> Waiting for simulation...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NARRATION PANEL -->
+        <div class="narration-panel glass-card" id="narrationPanel" style="margin-top: 24px; margin-bottom: 24px; padding: 20px 28px; border-left: 3px solid var(--accent);">
+            <div style="display: flex; align-items: flex-start; gap: 14px;">
+                <div style="min-width: 40px; height: 40px; border-radius: 10px; background: rgba(123,97,255,0.15); display:flex; align-items:center; justify-content:center;">
+                    <i class="fas fa-comment-dots" style="color: var(--accent); font-size: 1.1rem;" id="narrationIcon"></i>
+                </div>
+                <div style="flex:1;">
+                    <h4 style="font-size: 0.82rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 6px;" id="narrationTitle">What's Happening</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; margin: 0;" id="narrationText">
+                        Press <strong>Start</strong> to activate SliceGuard's monitoring system. The canvas shows 3 isolated network slices running on shared infrastructure: 
+                        <strong style="color: var(--embb-color);">eMBB</strong> (streaming — blue packets), 
+                        <strong style="color: var(--urllc-color);">URLLC</strong> (critical systems — red packets), and 
+                        <strong style="color: var(--mmtc-color);">mMTC</strong> (IoT sensors — green packets). 
+                        Each lane represents a virtual slice with its own guaranteed QoS.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-row">
+            <div class="chart-card">
+                <h5><i class="fas fa-wave-square"></i> Throughput</h5>
+                <canvas id="chartThroughput"></canvas>
+            </div>
+            <div class="chart-card">
+                <h5><i class="fas fa-clock"></i> Latency</h5>
+                <canvas id="chartLatency"></canvas>
+            </div>
+            <div class="chart-card">
+                <h5><i class="fas fa-triangle-exclamation"></i> Threat Level</h5>
+                <canvas id="chartAnomaly"></canvas>
+            </div>
+            <div class="chart-card">
+                <h5><i class="fas fa-chart-pie"></i> Traffic Distribution</h5>
+                <canvas id="chartDistribution"></canvas>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== ATTACK EXPLANATION ========== -->
+<section class="attack-section" id="attacks">
+    <div class="container">
+        <div class="reveal">
+            <span class="section-label">Threat Landscape</span>
+            <h2 class="section-title">Threats SliceGuard Defends Against</h2>
+            <p class="section-subtitle">
+                SliceGuard is built to detect and neutralize threats that exploit shared physical infrastructure 
+                to breach the isolation boundaries between virtualized network slices.
+            </p>
+        </div>
+
+        <div class="attack-flow">
+            <div class="attack-step reveal">
+                <div class="step-number">1</div>
+                <h4>Reconnaissance</h4>
+                <p>The attacker gains access to a low-security slice (e.g., mMTC). They probe the shared infrastructure to identify resource contention points and slice topology information.</p>
+            </div>
+            <div class="attack-step reveal">
+                <div class="step-number">2</div>
+                <h4>Resource Mapping</h4>
+                <p>Using timing side-channels and traffic analysis, the attacker maps shared resources: CPU cores, memory banks, network buffers, and hypervisor interfaces across slices.</p>
+            </div>
+            <div class="attack-step reveal">
+                <div class="step-number">3</div>
+                <h4>Isolation Breach</h4>
+                <p>The attacker exploits vulnerabilities — shared VNF bugs, hypervisor escapes, or API flaws — to cross the slice boundary and access the target slice's resources.</p>
+            </div>
+            <div class="attack-step reveal">
+                <div class="step-number">4</div>
+                <h4>Exploitation</h4>
+                <p>Once across the boundary: steal bandwidth (resource theft), inject malicious packets (data injection), or exfiltrate sensitive data from the critical URLLC slice.</p>
+            </div>
+            <div class="attack-step reveal">
+                <div class="step-number">5</div>
+                <h4>Impact</h4>
+                <p>The compromised URLLC slice experiences latency spikes, potentially causing autonomous vehicle failures, surgical robot malfunctions, or industrial control disruptions.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== DETECTION ========== -->
+<section class="detection-section" id="detection">
+    <div class="container">
+        <div class="reveal">
+            <span class="section-label">Defense Engine</span>
+            <h2 class="section-title">SliceGuard IDS Architecture</h2>
+            <p class="section-subtitle">
+                SliceGuard implements a multi-layered intrusion detection pipeline that correlates signals 
+                across slices to identify and auto-quarantine threats before they propagate.
+            </p>
+        </div>
+
+        <!-- Real vs Concept Callout -->
+        <div class="glass-card reveal" style="margin-bottom: 40px; border-left: 3px solid var(--urllc-color); padding: 24px 28px;">
+            <h4 style="color: var(--urllc-color); margin-bottom: 8px; font-size: 0.95rem;"><i class="fas fa-globe"></i> Is SliceGuard a Real Product?</h4>
+            <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.7; margin: 0;">
+                "SliceGuard" is an educational prototype built for this presentation, but the <strong>technology is real</strong>. It acts as a conceptual implementation of the 3GPP <strong>NWDAF (Network Data Analytics Function)</strong>—a standard 5G core component that gathers telemetry and uses ML to provide predictive network analytics. It adopts state-of-the-art anomaly-based cross-slice intrusion detection strategies from recent academic research, mimicking enterprise-grade 5G security appliances.
+            </p>
+        </div>
+        
+        <!-- Lifecycle Callout -->
+        <div class="glass-card reveal" style="margin-bottom: 40px; padding: 24px 28px; background: rgba(10,12,16,0.3);">
+            <h4 style="color: var(--text-primary); margin-bottom: 20px; font-size: 1.1rem; text-align: center;">The Automated Guarding Lifecycle</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; text-align: center;">
+                <div style="flex: 1; min-width: 140px;">
+                    <div style="color: var(--accent); font-size: 1.8rem; margin-bottom: 10px;"><i class="fas fa-eye"></i></div>
+                    <strong style="display:block; margin-bottom: 6px;">1. Observe</strong>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Ingests UPF telemetry.</div>
+                </div>
+                <div style="flex: 1; min-width: 140px;">
+                    <div style="color: var(--danger); font-size: 1.8rem; margin-bottom: 10px;"><i class="fas fa-microchip"></i></div>
+                    <strong style="display:block; margin-bottom: 6px;">2. Detect</strong>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Flags resource spikes.</div>
+                </div>
+                <div style="flex: 1; min-width: 140px;">
+                    <div style="color: var(--warning); font-size: 1.8rem; margin-bottom: 10px;"><i class="fas fa-link"></i></div>
+                    <strong style="display:block; margin-bottom: 6px;">3. Correlate</strong>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Links mMTC to URLLC lag.</div>
+                </div>
+                <div style="flex: 1; min-width: 140px;">
+                    <div style="color: var(--urllc-color); font-size: 1.8rem; margin-bottom: 10px;"><i class="fas fa-lock"></i></div>
+                    <strong style="display:block; margin-bottom: 6px;">4. Isolate</strong>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">SMF drops attacker.</div>
+                </div>
+                <div style="flex: 1; min-width: 140px;">
+                    <div style="color: var(--mmtc-color); font-size: 1.8rem; margin-bottom: 10px;"><i class="fas fa-heart-pulse"></i></div>
+                    <strong style="display:block; margin-bottom: 6px;">5. Restore</strong>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Yields safe sub-1ms.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="detection-grid">
+            <div class="detection-card reveal">
+                <div class="det-icon"><i class="fas fa-chart-line"></i></div>
+                <h4>Behavioral Baseline Engine</h4>
+                <p>SliceGuard continuously profiles each slice's traffic baseline. Z-score and IQR-based detectors flag deviations in throughput, packet size distribution, and inter-arrival times.</p>
+            </div>
+            <div class="detection-card reveal">
+                <div class="det-icon"><i class="fas fa-gauge-high"></i></div>
+                <h4>Resource Contention Monitor</h4>
+                <p>Per-slice CPU, memory, and bandwidth telemetry is sampled every 100ms. Cross-correlation detects when one slice's spike coincides with another's degradation — a contention attack signature.</p>
+            </div>
+            <div class="detection-card reveal">
+                <div class="det-icon"><i class="fas fa-magnifying-glass-chart"></i></div>
+                <h4>Inter-Slice Boundary Guards</h4>
+                <p>Deep packet inspection at slice boundaries detects unauthorized cross-slice communication. Any packet crossing a boundary without proper authorization is flagged.</p>
+            </div>
+            <div class="detection-card reveal">
+                <div class="det-icon"><i class="fas fa-brain"></i></div>
+                <h4>Adaptive ML Classifier</h4>
+                <p>An Isolation Forest model trained on normal slice telemetry detects subtle attack signatures invisible to rules — including cache-timing side-channels and covert resource exfiltration.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== PROTOCOL COMPARISON ========== -->
+<section class="comparison-section" id="comparison">
+    <div class="container">
+        <div class="reveal">
+            <span class="section-label">Context</span>
+            <h2 class="section-title">Mobile Security Evolution</h2>
+            <p class="section-subtitle">
+                Understanding how mobile network security has evolved across generations helps contextualize 
+                why 5G slicing introduces new attack surfaces.
+            </p>
+        </div>
+
+        <div class="comparison-table-wrapper reveal">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Generation</th>
+                        <th>Encryption</th>
+                        <th>Authentication</th>
+                        <th>Key Vulnerability</th>
+                        <th>Slice Support</th>
+                        <th>Security Level</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="gen-badge gen-2g">2G GSM</span></td>
+                        <td>A5/1, A5/2 (weak)</td>
+                        <td>One-way (network only)</td>
+                        <td>IMSI exposed, broken cipher</td>
+                        <td>None</td>
+                        <td>
+                            <div class="security-level">
+                                <div class="security-bar"><div class="security-bar-fill" style="width:20%; background:var(--danger)"></div></div>
+                                <span style="color:var(--danger); font-size:0.78rem; font-weight:600;">Low</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="gen-badge gen-3g">3G UMTS</span></td>
+                        <td>KASUMI (128-bit)</td>
+                        <td>Mutual authentication</td>
+                        <td>Downgrade to 2G possible</td>
+                        <td>None</td>
+                        <td>
+                            <div class="security-level">
+                                <div class="security-bar"><div class="security-bar-fill" style="width:45%; background:var(--warning)"></div></div>
+                                <span style="color:var(--warning); font-size:0.78rem; font-weight:600;">Medium</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="gen-badge gen-4g">4G LTE</span></td>
+                        <td>SNOW 3G, AES-128</td>
+                        <td>Mutual + key agreement</td>
+                        <td>Diameter protocol, IMSI still exposed</td>
+                        <td>Limited (QoS)</td>
+                        <td>
+                            <div class="security-level">
+                                <div class="security-bar"><div class="security-bar-fill" style="width:70%; background:var(--embb-color)"></div></div>
+                                <span style="color:var(--embb-color); font-size:0.78rem; font-weight:600;">Good</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="gen-badge gen-5g">5G NR</span></td>
+                        <td>NEA1/2/3, AES-256</td>
+                        <td>5G-AKA + SUPI/SUCI privacy</td>
+                        <td>Network slicing isolation</td>
+                        <td><strong style="color:var(--mmtc-color)">Full (NSSF)</strong></td>
+                        <td>
+                            <div class="security-level">
+                                <div class="security-bar"><div class="security-bar-fill" style="width:90%; background:var(--mmtc-color)"></div></div>
+                                <span style="color:var(--mmtc-color); font-size:0.78rem; font-weight:600;">High</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ========== TEAM ========== -->
+<section class="team-section" id="team">
+    <div class="container">
+        <div class="reveal" style="text-align:center;">
+            <span class="section-label">Project Team</span>
+            <h2 class="section-title">Developed By</h2>
+        </div>
+        <div class="team-card reveal">
+            <div class="team-avatar">FR</div>
+            <h3>Mohamed Fouad Rabahi</h3>
+            <p class="team-role">5G Security Engineer</p>
+            <p>
+                Designed and implemented 5G SliceGuard — a real-time intrusion detection and automated response 
+                system for virtualized network slices, featuring multi-layer anomaly analysis and threat quarantine.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer>
+    <div class="container">
+        <p>&copy; 2026 5G SliceGuard — Intrusion Detection for Virtualized Network Slices</p>
+        <div class="footer-links">
+            <a href="#about">About</a>
+            <a href="#simulator">Simulator</a>
+            <a href="#attacks">Attacks</a>
+            <a href="#detection">Detection</a>
+        </div>
+    </div>
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>

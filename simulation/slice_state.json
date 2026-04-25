@@ -1,0 +1,1 @@
+{"slices": {"eMBB": {"bandwidth": 801.2854827877328, "latency": 4.0, "status": "NORMAL"}, "URLLC": {"bandwidth": 100, "latency": 0.8, "status": "NORMAL"}, "mMTC": {"bandwidth": 0.0, "latency": 10.0, "status": "NORMAL"}}, "shared_cpu_usage": 40.0, "attacker_active": true, "quarantined": true}
