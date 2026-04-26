@@ -152,17 +152,20 @@ class TrafficGenerator:
 
         if self.attack_active == "resource_theft":
             # ── Resource Theft ──────────────────────────────────
-            # Attacker (mMTC) floods CPU/bandwidth
-            slices["mMTC"]["bandwidth_mbps"] *= (1 + 1.5 * intensity)
-            slices["mMTC"]["cpu_usage_pct"] *= (1 + 2.0 * intensity)
-            slices["mMTC"]["packet_rate_pps"] *= (1 + 2.0 * intensity)
-            slices["mMTC"]["memory_usage_pct"] *= (1 + 1.0 * intensity)
+            # Attacker (mMTC) floods CPU/bandwidth (matches dataset: bw~1800, cpu~85, pps~15000)
+            slices["mMTC"]["bandwidth_mbps"] *= (1 + 8.0 * intensity)  # 200 * 9 = 1800
+            slices["mMTC"]["cpu_usage_pct"] += 70.0 * intensity        # 15 + 70 = 85
+            slices["mMTC"]["packet_rate_pps"] *= (1 + 29.0 * intensity)# 500 * 30 = 15000
+            slices["mMTC"]["memory_usage_pct"] += 50.0 * intensity     # 20 + 50 = 70
+            slices["mMTC"]["cross_slice_score"] += 0.4 * intensity
 
-            # Victim (URLLC) — resource starvation → latency spike
-            slices["URLLC"]["latency_ms"] *= (1 + 4.0 * intensity)
-            slices["URLLC"]["cpu_usage_pct"] += 30 * intensity
-            slices["URLLC"]["jitter_ms"] += 2.0 * intensity
-            slices["URLLC"]["drop_rate_pct"] += 5.0 * intensity
+            # Victim (URLLC) — resource starvation → latency spike (matches dataset: lat~4.5, cpu~60)
+            slices["URLLC"]["bandwidth_mbps"] *= (1 - 0.25 * intensity)# 200 * 0.75 = 150
+            slices["URLLC"]["latency_ms"] += 3.7 * intensity           # 0.8 + 3.7 = ~4.5
+            slices["URLLC"]["cpu_usage_pct"] += 40.0 * intensity       # 20 + 40 = 60
+            slices["URLLC"]["jitter_ms"] += 1.45 * intensity           # 0.05 + 1.45 = 1.5
+            slices["URLLC"]["drop_rate_pct"] += 3.0 * intensity        # 0.01 + 3.0 = ~3.0
+            slices["URLLC"]["cross_slice_score"] += 0.3 * intensity
 
             # Secondary victim (eMBB) — bandwidth starved
             slices["eMBB"]["bandwidth_mbps"] *= (1 - 0.3 * intensity)
