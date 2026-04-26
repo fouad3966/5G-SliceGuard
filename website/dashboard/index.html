@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SliceGuard IDS — 5G Network Slice Security Operations Center</title>
+    <meta name="description" content="Real-time intrusion detection and automated response system for virtualized 5G network slices. ML-powered cross-slice threat detection.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- ═══════ FULLSCREEN QUARANTINE FLASH ═══════ -->
+    <div id="quarantine-flash" class="quarantine-flash"></div>
+
+    <!-- ═══════ HEADER ═══════ -->
+    <header class="header" id="header">
+        <div class="header-left">
+            <div class="logo">
+                <span class="logo-icon">🛡️</span>
+                <div class="logo-text">
+                    <h1>SliceGuard <span class="logo-ids">IDS</span></h1>
+                    <span class="logo-sub">5G Network Slice Security</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-center">
+            <div id="connection-badge" class="connection-badge offline">
+                <span class="connection-dot"></span>
+                <span class="connection-text">CONNECTING...</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="header-stat">
+                <span class="stat-label">TICK</span>
+                <span class="stat-value" id="tick-count">0</span>
+            </div>
+            <div class="header-stat">
+                <span class="stat-label">UPTIME</span>
+                <span class="stat-value" id="uptime">0s</span>
+            </div>
+            <div class="header-stat">
+                <span class="stat-label">ML MODEL</span>
+                <span class="stat-value stat-ok" id="model-status">—</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══════ MAIN DASHBOARD ═══════ -->
+    <main class="dashboard">
+
+        <!-- ── SLICE CARDS ROW ── -->
+        <section class="slice-cards" id="slice-cards">
+            <!-- eMBB Card -->
+            <div class="slice-card" id="card-eMBB" data-slice="eMBB">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="slice-dot embb"></span>
+                        <h2>eMBB</h2>
+                        <span class="slice-full">Enhanced Mobile Broadband</span>
+                    </div>
+                    <div class="sla-badge" id="sla-eMBB">OK</div>
+                </div>
+                <div class="card-metrics">
+                    <div class="metric-primary">
+                        <span class="metric-value" id="embb-bandwidth">—</span>
+                        <span class="metric-unit">Mbps</span>
+                        <span class="metric-label">Bandwidth</span>
+                    </div>
+                    <div class="metric-row">
+                        <div class="metric-item">
+                            <span class="metric-name">Latency</span>
+                            <span class="metric-val" id="embb-latency">—</span>
+                            <span class="metric-u">ms</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-name">CPU</span>
+                            <span class="metric-val" id="embb-cpu">—</span>
+                            <span class="metric-u">%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-name">Packets</span>
+                            <span class="metric-val" id="embb-packets">—</span>
+                            <span class="metric-u">pps</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-analysis">
+                    <div class="analysis-row">
+                        <span class="analysis-label">ML Verdict</span>
+                        <span class="analysis-verdict" id="embb-verdict">—</span>
+                    </div>
+                    <div class="analysis-bar-wrap">
+                        <div class="analysis-bar" id="embb-bar" style="width: 0%"></div>
+                    </div>
+                    <span class="analysis-score" id="embb-score">0%</span>
+                </div>
+            </div>
+
+            <!-- URLLC Card -->
+            <div class="slice-card urllc-card" id="card-URLLC" data-slice="URLLC">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="slice-dot urllc"></span>
+                        <h2>URLLC</h2>
+                        <span class="slice-full">Ultra-Reliable Low Latency</span>
+                    </div>
+                    <div class="sla-badge" id="sla-URLLC">OK</div>
+                </div>
+                <div class="card-metrics">
+                    <div class="metric-primary">
+                        <span class="metric-value" id="urllc-latency-big">—</span>
+                        <span class="metric-unit">ms</span>
+                        <span class="metric-label">Latency</span>
+                    </div>
+                    <div class="metric-row">
+                        <div class="metric-item">
+                            <span class="metric-name">Bandwidth</span>
+                            <span class="metric-val" id="urllc-bandwidth">—</span>
+                            <span class="metric-u">Mbps</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-name">CPU</span>
+                            <span class="metric-val" id="urllc-cpu">—</span>
+                            <span class="metric-u">%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-name">Drop Rate</span>
+                            <span class="metric-val" id="urllc-drop">—</span>
+                            <span class="metric-u">%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-analysis">
+                    <div class="analysis-row">
+                        <span class="analysis-label">ML Verdict</span>
+                        <span class="analysis-verdict" id="urllc-verdict">—</span>
+                    </div>
+                    <div class="analysis-bar-wrap">
+                        <div class="analysis-bar" id="urllc-bar" style="width: 0%"></div>
+                    </div>
+                    <span class="analysis-score" id="urllc-score">0%</span>
+                </div>
+            </div>
+
+            <!-- mMTC Card -->
+            <div class="slice-card" id="card-mMTC" data-slice="mMTC">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="slice-dot mmtc"></span>
+                        <h2>mMTC</h2>
+                        <span class="slice-full">Massive Machine-Type Comms</span>
+                    </div>
+                    <div class="sla-badge" id="sla-mMTC">OK</div>
+                </div>
+                <div class="card-metrics">
+                    <div class="metric-primary">
+                        <span class="metric-value" id="mmtc-packets-big">—</span>
+                        <span class="metric-unit">pps</span>
+                        <span class="metric-label">Packet Rate</span>
+                    </div>
+                    <div class="metric-row">
+                        <div class="metric-item">
+                            <span class="metric-name">Bandwidth</span>
+                            <span class="metric-val" id="mmtc-bandwidth">—</span>
+                            <span class="metric-u">Mbps</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-name">CPU</span>
+                            <span class="metric-val" id="mmtc-cpu">—</span>
+                            <span class="metric-u">%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-name">Latency</span>
+                            <span class="metric-val" id="mmtc-latency">—</span>
+                            <span class="metric-u">ms</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-analysis">
+                    <div class="analysis-row">
+                        <span class="analysis-label">ML Verdict</span>
+                        <span class="analysis-verdict" id="mmtc-verdict">—</span>
+                    </div>
+                    <div class="analysis-bar-wrap">
+                        <div class="analysis-bar" id="mmtc-bar" style="width: 0%"></div>
+                    </div>
+                    <span class="analysis-score" id="mmtc-score">0%</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── CHARTS ROW ── -->
+        <section class="charts-row">
+            <div class="chart-container chart-large" id="chart-latency-container">
+                <div class="chart-header">
+                    <h3>⚡ URLLC Latency — Real-Time</h3>
+                    <span class="chart-badge" id="latency-badge">NOMINAL</span>
+                </div>
+                <canvas id="chart-latency"></canvas>
+            </div>
+            <div class="chart-container chart-medium" id="chart-anomaly-container">
+                <div class="chart-header">
+                    <h3>🧠 Anomaly Score — All Slices</h3>
+                    <span class="chart-badge" id="anomaly-badge">LOW</span>
+                </div>
+                <canvas id="chart-anomaly"></canvas>
+            </div>
+        </section>
+
+        <!-- ── SECONDARY CHARTS ── -->
+        <section class="charts-row secondary-charts">
+            <div class="chart-container chart-third">
+                <div class="chart-header">
+                    <h3>📶 eMBB Bandwidth</h3>
+                </div>
+                <canvas id="chart-bandwidth"></canvas>
+            </div>
+            <div class="chart-container chart-third">
+                <div class="chart-header">
+                    <h3>📊 CPU Usage — Per Slice</h3>
+                </div>
+                <canvas id="chart-cpu"></canvas>
+            </div>
+            <div class="chart-container chart-third">
+                <div class="chart-header">
+                    <h3>📡 mMTC Packet Rate</h3>
+                </div>
+                <canvas id="chart-packets"></canvas>
+            </div>
+        </section>
+
+        <!-- ── CONTROL + ALERTS ROW ── -->
+        <section class="control-row">
+            <!-- Attack Panel -->
+            <div class="panel attack-panel" id="attack-panel">
+                <h3>⚔️ Attack Simulation</h3>
+                <p class="panel-desc">Launch a cross-slice attack to test the IDS</p>
+
+                <div class="attack-buttons">
+                    <button class="attack-btn resource-theft" id="btn-resource-theft" onclick="launchAttack('resource_theft')">
+                        <span class="btn-icon">💥</span>
+                        <span class="btn-label">Resource Theft</span>
+                        <span class="btn-desc">mMTC floods CPU/BW → URLLC starved</span>
+                    </button>
+                    <button class="attack-btn data-injection" id="btn-data-injection" onclick="launchAttack('data_injection')">
+                        <span class="btn-icon">💉</span>
+                        <span class="btn-label">Data Injection</span>
+                        <span class="btn-desc">Malicious packets → URLLC data plane</span>
+                    </button>
+                    <button class="attack-btn side-channel" id="btn-side-channel" onclick="launchAttack('side_channel')">
+                        <span class="btn-icon">👁️</span>
+                        <span class="btn-label">Side-Channel</span>
+                        <span class="btn-desc">Cache timing covert channel (subtle)</span>
+                    </button>
+                </div>
+
+                <div class="attack-controls">
+                    <button class="stop-btn" id="btn-stop" onclick="stopAttack()">🛑 Stop Attack</button>
+                    <button class="quarantine-btn" id="btn-quarantine" onclick="manualQuarantine()">🔒 Force Quarantine</button>
+                </div>
+
+                <div class="attack-status" id="attack-status">
+                    <span class="status-label">Status:</span>
+                    <span class="status-value" id="attack-status-text">No attack active</span>
+                </div>
+
+                <div class="intensity-bar-wrap" id="intensity-wrap" style="display: none;">
+                    <span class="intensity-label">Attack Intensity</span>
+                    <div class="intensity-bar-bg">
+                        <div class="intensity-bar" id="intensity-bar" style="width: 0%"></div>
+                    </div>
+                    <span class="intensity-value" id="intensity-value">0%</span>
+                </div>
+            </div>
+
+            <!-- Alert Log -->
+            <div class="panel alert-panel" id="alert-panel">
+                <div class="alert-header">
+                    <h3>🚨 Live Alert Feed</h3>
+                    <span class="alert-count" id="alert-count">0 alerts</span>
+                </div>
+                <div class="alert-log" id="alert-log">
+                    <div class="alert-empty">Waiting for events...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── QUARANTINE STATUS BAR ── -->
+        <section class="quarantine-bar" id="quarantine-section" style="display: none;">
+            <div class="quarantine-content">
+                <div class="quarantine-icon">🔒</div>
+                <div class="quarantine-info">
+                    <h3 id="quarantine-title">QUARANTINE ACTIVE</h3>
+                    <p id="quarantine-detail">Isolating compromised slice boundary...</p>
+                </div>
+                <div class="quarantine-progress-wrap">
+                    <div class="quarantine-progress-bar">
+                        <div class="quarantine-progress" id="quarantine-progress" style="width: 0%"></div>
+                    </div>
+                    <span class="quarantine-pct" id="quarantine-pct">0%</span>
+                </div>
+                <button class="release-btn" id="btn-release" onclick="manualRelease()">Release</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ═══════ FOOTER ═══════ -->
+    <footer class="footer">
+        <span>5G SliceGuard — Mohamed Fouad Rabahi — ESI 2026</span>
+        <span class="footer-sep">|</span>
+        <span>Real ML Backend: XGBoost + Isolation Forest</span>
+        <span class="footer-sep">|</span>
+        <span id="footer-port">API: localhost:5000</span>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

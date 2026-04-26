@@ -1,0 +1,34 @@
+{
+  "feature_columns": [
+    "slice_id",
+    "bandwidth_mbps",
+    "latency_ms",
+    "packet_rate_pps",
+    "cpu_usage_pct",
+    "memory_usage_pct",
+    "jitter_ms",
+    "drop_rate_pct",
+    "cross_slice_score",
+    "bandwidth_mean_10",
+    "bandwidth_std_10",
+    "latency_mean_10",
+    "latency_std_10",
+    "cpu_mean_10",
+    "cpu_std_10",
+    "bandwidth_delta",
+    "latency_delta",
+    "cpu_delta",
+    "latency_bandwidth_ratio",
+    "resource_pressure"
+  ],
+  "label_map": {
+    "0": "normal",
+    "1": "resource_theft",
+    "2": "data_injection",
+    "3": "side_channel"
+  },
+  "xgb_accuracy": 1.0,
+  "iso_anomaly_recall": 0.9216666666666666,
+  "training_samples": 8000,
+  "test_samples": 2000
+}
