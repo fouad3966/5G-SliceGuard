@@ -119,6 +119,7 @@ class SliceGuardDetector:
                 xgb_class = 0
                 xgb_confidence = 1.0
                 iso_normalized = 0.0
+                xgb_proba = [1.0, 0.0, 0.0, 0.0]
             else:
                 xgb_proba = self.xgb_model.predict_proba(X)[0]
                 xgb_class = int(np.argmax(xgb_proba))
