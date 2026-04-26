@@ -306,6 +306,7 @@ def api_attack():
 def api_attack_stop():
     """Stop the current attack."""
     generator.stop_attack()
+    detector.reset_warmup(generator.tick_count)
     return jsonify({"status": "attack_stopped"})
 
 

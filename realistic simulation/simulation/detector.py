@@ -48,9 +48,15 @@ class SliceGuardDetector:
         }
         self.model_loaded = False
         self.xgb_accuracy = 0.0
+        self.warmup_until_tick = 10  # Wait for rolling windows to populate
 
         # Load models
         self._load_models()
+
+    def reset_warmup(self, current_tick: int):
+        """Reset the feature extractor and enter warmup phase to avoid false positives."""
+        self.feature_extractor.reset()
+        self.warmup_until_tick = current_tick + 10
 
     def _load_models(self):
         """Load trained models from disk."""
@@ -108,16 +114,21 @@ class SliceGuardDetector:
             X = np.array([feature_vector])
 
             # 2. XGBoost prediction
-            xgb_proba = self.xgb_model.predict_proba(X)[0]
-            xgb_class = int(np.argmax(xgb_proba))
-            xgb_confidence = float(xgb_proba[xgb_class])
-            xgb_label = LABEL_MAP[xgb_class]
+            if snapshot["tick"] <= self.warmup_until_tick:
+                # Warm-up phase to let rolling windows fill up
+                xgb_class = 0
+                xgb_confidence = 1.0
+                iso_normalized = 0.0
+            else:
+                xgb_proba = self.xgb_model.predict_proba(X)[0]
+                xgb_class = int(np.argmax(xgb_proba))
+                xgb_confidence = float(xgb_proba[xgb_class])
+                
+                # 3. Isolation Forest anomaly score
+                iso_raw = float(self.iso_model.decision_function(X)[0])
+                iso_normalized = max(0.0, min(1.0, 0.5 - iso_raw))
 
-            # 3. Isolation Forest anomaly score
-            # decision_function: positive = normal, negative = anomalous
-            iso_raw = float(self.iso_model.decision_function(X)[0])
-            # Normalize to 0-1 where higher = more anomalous
-            iso_normalized = max(0.0, min(1.0, 0.5 - iso_raw))
+            xgb_label = LABEL_MAP[xgb_class]
 
             # 4. Combined confidence score
             if xgb_class != 0:

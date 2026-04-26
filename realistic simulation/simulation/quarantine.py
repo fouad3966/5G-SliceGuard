@@ -79,6 +79,7 @@ class QuarantineEngine:
         """Force quarantine regardless of ML verdict."""
         current_time = time.time()
         self.generator.stop_attack()
+        self.detector.reset_warmup(self.generator.tick_count)
         self.quarantine_active = True
         self.quarantine_start_time = current_time
         self.restoration_countdown = 10
@@ -95,6 +96,7 @@ class QuarantineEngine:
         # This is where the IDS sends the API trigger to the SMF
         # to terminate the compromised device's PDU session
         self.generator.stop_attack()
+        self.detector.reset_warmup(self.generator.tick_count)
         self.quarantine_active = True
         self.quarantine_start_time = current_time
         self.restoration_countdown = 10
