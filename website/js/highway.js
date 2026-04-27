@@ -1,5 +1,5 @@
 /**
- * Highway Analogy Animation
+ * Highway Analogy Animation v2 (Detailed PDU Lanes)
  * 5G Slicing & SMF Quarantine Visualization
  */
 
@@ -15,14 +15,16 @@ class HighwaySimulator {
         this.particles = [];
         this.quarantineWallY = -100;
         
-        // Lanes: 0=eMBB, 1=URLLC, 2=mMTC
+        // Main Slices (Lanes)
+        // We will define inner PDU sub-lanes offset from the center
         this.lanes = [
-            { name: "eMBB", y: 80, speedMultiplier: 1.0, color: "#00b4d8" },
-            { name: "URLLC", y: 180, speedMultiplier: 1.5, color: "#ff006e" },
-            { name: "mMTC", y: 280, speedMultiplier: 0.6, color: "#39ff14" }
+            { name: "eMBB", y: 80, speedMultiplier: 1.0, color: "#00b4d8", pduOffsets: [-15, 0, 15] },
+            { name: "URLLC", y: 180, speedMultiplier: 1.5, color: "#ff006e", pduOffsets: [-15, 0, 15] },
+            { name: "mMTC", y: 280, speedMultiplier: 0.6, color: "#39ff14", pduOffsets: [-15, 0, 15] }
         ];
 
         this.frameCounter = 0;
+        this.nextId = 100;
         
         this.resize();
         window.addEventListener('resize', () => this.resize());
@@ -33,13 +35,12 @@ class HighwaySimulator {
         if (!this.canvas) return;
         const rect = this.canvas.parentElement.getBoundingClientRect();
         this.canvas.width = rect.width;
-        this.canvas.height = 400; // Fixed height
+        this.canvas.height = 400; 
     }
 
     setMode(newMode) {
         this.mode = newMode;
         if (newMode === 'quarantine') {
-            // Drop the SMF wall animation
             this.quarantineWallY = 0;
         }
     }
@@ -53,33 +54,41 @@ class HighwaySimulator {
         
         // mMTC cars
         if (this.mode === 'attack') {
-            // Zombie flood
-            if (Math.random() < 0.4) this.addCar(2, 'zombie');
-            if (Math.random() < 0.02) this.addCar(2, 'normal');
+            // Zombie flood ONLY on PDU sub-lanes 1 and 2
+            if (Math.random() < 0.4) {
+                let subLane = Math.random() > 0.5 ? 1 : 2;
+                this.addCar(2, 'zombie', subLane);
+            }
+            // Normal cars keep flowing on PDU sub-lane 0
+            if (Math.random() < 0.02) this.addCar(2, 'normal', 0);
         } else {
-            // Normal mMTC
+            // Normal mMTC flowing everywhere
             if (Math.random() < 0.04) this.addCar(2, 'normal');
         }
     }
 
-    addCar(laneIndex, type) {
+    addCar(laneIndex, type, forcedSubLane = -1) {
         let speed = (Math.random() * 2 + 3) * this.lanes[laneIndex].speedMultiplier;
         
         // Simulating Resource Theft: URLLC slows down dramatically during attack
-        if (this.mode === 'attack' && laneIndex === 1) {
-            speed *= 0.2; // Massive latency spike
-        }
+        if (this.mode === 'attack' && laneIndex === 1) speed *= 0.2; 
         
+        // Choose sub-lane (PDU tunnel)
+        let subLaneIndex = forcedSubLane !== -1 ? forcedSubLane : Math.floor(Math.random() * 3);
+        let id = this.nextId++;
+        if (this.nextId > 999) this.nextId = 100;
+
         this.cars.push({
+            id: id,
             x: -40,
-            y: this.lanes[laneIndex].y,
+            y: this.lanes[laneIndex].y + this.lanes[laneIndex].pduOffsets[subLaneIndex],
             lane: laneIndex,
-            type: type, // 'normal', 'zombie'
+            subLane: subLaneIndex,
+            type: type, 
             speed: speed,
-            width: type === 'zombie' ? 12 : 20,
-            height: type === 'zombie' ? 12 : 10,
+            width: type === 'zombie' ? 14 : 20,
+            height: type === 'zombie' ? 14 : 10,
             color: type === 'zombie' ? '#ff3860' : this.lanes[laneIndex].color,
-            dead: false
         });
     }
 
@@ -99,13 +108,13 @@ class HighwaySimulator {
         this.frameCounter++;
         this.spawnCars();
 
-        // Update cars
         for (let i = this.cars.length - 1; i >= 0; i--) {
             let car = this.cars[i];
             
-            // SMF Quarantine active: Destroy zombies
-            if (this.mode === 'quarantine' && car.type === 'zombie') {
-                if (car.x > 100) { // SMF firewall line
+            // SMF Quarantine active: Destroy zombies on specific sub-lanes
+             if (this.mode === 'quarantine' && car.lane === 2 && (car.subLane === 1 || car.subLane === 2)) {
+                // If it hits the firewall line
+                if (car.x > 140) { 
                     this.createExplosion(car.x, car.y);
                     this.cars.splice(i, 1);
                     continue;
@@ -114,11 +123,9 @@ class HighwaySimulator {
 
             car.x += car.speed;
             
-            // Speed adjustments based on real-time mode changes
             if (car.lane === 1) {
-                const targetSpeed = (this.mode === 'attack') ? car.speed * 0.2 : (car.speed > 2 ? car.speed : (Math.random() * 2 + 3)*1.5 );
-                if (this.mode === 'attack' && car.speed > 1) car.speed *= 0.95; // decelerate
-                if (this.mode !== 'attack' && car.speed < 3) car.speed += 0.1; // accelerate back
+                if (this.mode === 'attack' && car.speed > 1) car.speed *= 0.95; 
+                if (this.mode !== 'attack' && car.speed < 3.5) car.speed += 0.1; 
             }
 
             if (car.x > this.canvas.width + 50) {
@@ -126,19 +133,20 @@ class HighwaySimulator {
             }
         }
 
-        // Update particles
         for (let i = this.particles.length-1; i>=0; i--) {
             let p = this.particles[i];
-            p.x += p.vx;
-            p.y += p.vy;
-            p.life--;
+            p.x += p.vx; p.y += p.vy; p.life--;
             if(p.life <= 0) this.particles.splice(i, 1);
         }
 
-        // Update Wall
-        if (this.mode === 'quarantine' && this.quarantineWallY < this.lanes[2].y - 20) {
-            this.quarantineWallY += 10;
-        } else if (this.mode !== 'quarantine') {
+        if (this.mode === 'quarantine') {
+            let targetY = this.lanes[2].y + Math.max(...this.lanes[2].pduOffsets) + 10;
+            let startY = this.lanes[2].y + this.lanes[2].pduOffsets[1] - 10;
+            if (this.quarantineWallY < targetY) {
+                if (this.quarantineWallY < startY) this.quarantineWallY = startY;
+                this.quarantineWallY += 10;
+            }
+        } else {
             this.quarantineWallY = -100;
         }
     }
@@ -147,70 +155,74 @@ class HighwaySimulator {
         const ctx = this.ctx;
         const w = this.canvas.width;
         const h = this.canvas.height;
-
         ctx.clearRect(0, 0, w, h);
 
-        // Draw Highway lanes
-        this.lanes.forEach((lane, i) => {
-            // Sub-background for lane
-            ctx.fillStyle = 'rgba(255,255,255,0.02)';
-            ctx.fillRect(0, lane.y - 30, w, 60);
+        // Draw Legend for IDs
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.font = '600 11px Inter';
+        ctx.fillText("Legend: Numeric IDs over cars visually represent the tracking of device IPs or SUPIs.", 20, 20);
 
-            // Center dotted line
-            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([20, 20]);
-            ctx.beginPath();
-            ctx.moveTo(0, lane.y);
-            ctx.lineTo(w, lane.y);
-            ctx.stroke();
-            ctx.setLineDash([]);
+        this.lanes.forEach((lane) => {
+            // Highlight background
+            ctx.fillStyle = 'rgba(255,255,255,0.02)';
+            ctx.fillRect(0, lane.y - 40, w, 80);
+
+            // Draw micro-lanes (PDU Sessions)
+            lane.pduOffsets.forEach((offset, idx) => {
+                ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(0, lane.y + offset);
+                ctx.lineTo(w, lane.y + offset);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // PDU label
+                ctx.fillStyle = `rgba(255,255,255,0.15)`;
+                ctx.font = '500 8px JetBrains Mono';
+                ctx.fillText(`PDU-${idx+1}`, 10, lane.y + offset + 3);
+            });
             
-            // Lane Name
-            ctx.fillStyle = `rgba(255,255,255,0.4)`;
+            ctx.fillStyle = `rgba(255,255,255,0.5)`;
             ctx.font = '700 14px Inter';
-            ctx.fillText(lane.name + " PDU Sessions", 20, lane.y - 10);
+            ctx.fillText(lane.name + " Slice", 20, lane.y - 25);
             
-            // Status text
             if (lane.name === "URLLC") {
                 ctx.fillStyle = this.mode === 'attack' ? '#ff3860' : '#23d160';
                 ctx.font = '500 11px JetBrains Mono';
-                ctx.fillText(this.mode === 'attack' ? "LATENCY SPIKE! (Cross-Slice Impact)" : "Normal Latency (Sub-1ms)", 20, lane.y + 20);
-            }
-            if (lane.name === "mMTC" && this.mode !== 'normal') {
-                ctx.fillStyle = this.mode === 'attack' ? '#ff3860' : '#23d160';
-                ctx.font = '500 11px JetBrains Mono';
-                ctx.fillText(this.mode === 'attack' ? "ROGUE DEVICE FLOOD (Zombies)" : "MALICIOUS FLOWS ISOLATED", 20, lane.y + 20);
+                ctx.fillText(this.mode === 'attack' ? "LATENCY SPIKE! (Cross-Slice Impact)" : "Normal Latency (Sub-1ms)", w - 240, lane.y - 25);
             }
         });
 
-        // Draw Quarantine Wall
+        // Draw Quarantine Firewall
         if (this.mode === 'quarantine') {
-            const wallX = 110;
-            // Draw forcefield over mMTC
-            const glow = ctx.createLinearGradient(wallX, this.lanes[2].y-30, wallX+20, this.lanes[2].y-30);
+            const wallX = 145;
+            const startY = this.lanes[2].y + this.lanes[2].pduOffsets[1] - 8;
+            
+            // Only blocks PDU-2 and PDU-3! PDU-1 is untouched.
+            const glow = ctx.createLinearGradient(wallX, startY, wallX+20, startY);
             glow.addColorStop(0, 'rgba(35, 209, 96, 0.8)');
             glow.addColorStop(1, 'transparent');
             ctx.fillStyle = glow;
-            ctx.fillRect(wallX, this.lanes[2].y-30, 40, 60);
+            ctx.fillRect(wallX, startY, 40, 40);
 
             ctx.strokeStyle = '#23d160';
             ctx.lineWidth = 4;
             ctx.beginPath();
-            ctx.moveTo(wallX, this.quarantineWallY);
-            ctx.lineTo(wallX, this.lanes[2].y + 30);
+            ctx.moveTo(wallX, startY);
+            ctx.lineTo(wallX, this.quarantineWallY);
             ctx.stroke();
 
             ctx.fillStyle = '#23d160';
             ctx.font = '700 12px Inter';
-            ctx.fillText("SMF ISOLATION LINE", wallX-50, this.lanes[2].y - 35);
+            ctx.fillText("SMF BLOCKS ONLY TARGET PDUs", wallX-90, startY - 10);
         }
 
         // Draw Cars
         this.cars.forEach(car => {
             ctx.fillStyle = car.color;
             if (car.type === 'zombie') {
-                // Triangle for zombie
                 ctx.beginPath();
                 ctx.moveTo(car.x + car.width, car.y);
                 ctx.lineTo(car.x, car.y - car.height/2);
@@ -218,13 +230,16 @@ class HighwaySimulator {
                 ctx.fill();
             } else {
                 ctx.fillRect(car.x, car.y - car.height/2, car.width, car.height);
-                // Headlight
                 ctx.fillStyle = 'rgba(255,255,255,0.6)';
                 ctx.fillRect(car.x + car.width - 2, car.y - car.height/2, 2, car.height);
             }
+            
+            // Draw ID Text
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            ctx.font = '500 8px JetBrains Mono';
+            ctx.fillText(car.id, car.x, car.y - 8);
         });
 
-        // Draw Particles
         this.particles.forEach(p => {
             ctx.fillStyle = p.color;
             ctx.globalAlpha = p.life / 30;
@@ -234,25 +249,10 @@ class HighwaySimulator {
             ctx.globalAlpha = 1.0;
         });
         
-        // Attack overlay glow
         if (this.mode === 'attack') {
             const pulse = (Math.sin(this.frameCounter * 0.05) + 1) * 0.5;
             ctx.fillStyle = `rgba(255, 56, 96, ${pulse * 0.05})`;
             ctx.fillRect(0, 0, w, h);
-            
-            ctx.fillStyle = '#ff3860';
-            ctx.font = '700 16px Inter';
-            ctx.textAlign = 'right';
-            ctx.fillText("⚠️ ML IDS: RESOURCE CONTENTION DETECTED", w - 20, 30);
-            ctx.textAlign = 'left';
-        }
-
-        if (this.mode === 'quarantine') {
-            ctx.fillStyle = '#23d160';
-            ctx.font = '700 16px Inter';
-            ctx.textAlign = 'right';
-            ctx.fillText("🛡️ AUTOMATED QUARANTINE ACTIVE", w - 20, 30);
-            ctx.textAlign = 'left';
         }
     }
 
@@ -263,7 +263,6 @@ class HighwaySimulator {
     }
 }
 
-// Initialize when loaded
 let hwySim;
 window.addEventListener('load', () => {
     hwySim = new HighwaySimulator();

@@ -239,6 +239,85 @@
     </div>
 </section>
 
+<!-- ========== DETECTION ========== -->
+
+<section class="detection-section" id="detection" style="background-color: var(--bg-color); padding: 80px 0;">
+    <div class="container">
+        <div class="reveal" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-label">Defense Engine</span>
+            <h2 class="section-title">SliceGuard Dual-Model Architecture</h2>
+            <p class="section-subtitle" style="max-width: 700px; margin: 0 auto;">
+                A multi-model machine learning pipeline integrated at the 5G Core. It extracts per-flow UPF telemetry and utilizes both supervised algorithms and unsupervised isolation forests to autonomously trigger the SMF.
+            </p>
+        </div>
+
+        <div class="reveal">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; position: relative;">
+                <style>
+                    .pipe-node { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 15px 25px; border-radius: 12px; width: 340px; text-align: center; z-index: 2; position: relative;}
+                    .pipe-node i { font-size: 28px; margin-bottom: 12px; }
+                    .pipe-node h4 { margin: 0 0 5px 0; color: #fff; font-size: 16px; font-family: 'JetBrains Mono', monospace;}
+                    .pipe-node p { margin: 0; color: rgba(255,255,255,0.6); font-size: 13.5px; }
+                    .pipe-connector-v { width: 4px; height: 40px; background: rgba(255,255,255,0.1); position: relative; overflow: hidden; }
+                    @keyframes dataFlow { 0% { top: -10px; opacity:1;} 80% { top: 40px; opacity:0;} 100% { top: 40px; opacity:0;}}
+                    .pipe-pulse { position: absolute; width: 10px; height: 10px; border-radius: 5px; background: var(--accent); left: -3px; animation: dataFlow 1.2s infinite ease-out; box-shadow: 0 0 10px var(--accent);}
+                    .split-container { display: flex; gap: 40px; position: relative; padding: 20px 0;}
+                    .split-line-top { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 380px; height: 3px; background: rgba(255,255,255,0.1); }
+                    .split-vert-top { position: absolute; top: 0; width: 3px; height: 20px; background: rgba(255,255,255,0.1); }
+                    .split-line-bot { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 380px; height: 3px; background: rgba(255,255,255,0.1); }
+                    .split-vert-bot { position: absolute; bottom: 0; width: 3px; height: 20px; background: rgba(255,255,255,0.1); }
+                </style>
+
+                <div class="pipe-node" style="border-top: 3px solid var(--accent);">
+                    <i class="fas fa-satellite-dish" style="color: var(--accent);"></i>
+                    <h4>UPF Data Plane</h4>
+                    <p>Continuous Per-Flow Telemetry. Monitors PDU sessions deep inside the GTP-U Tunnels.</p>
+                </div>
+
+                <div class="pipe-connector-v"><div class="pipe-pulse"></div></div>
+
+                <div class="pipe-node">
+                    <i class="fas fa-filter" style="color: var(--warning);"></i>
+                    <h4>Feature Engineering Engine</h4>
+                    <p>Calculates QoS, Infrastructure, and Cross-Slice correlations across a 10-tick rolling window.</p>
+                </div>
+
+                <div class="pipe-connector-v"><div class="pipe-pulse" style="background:var(--warning); box-shadow: 0 0 10px var(--warning); animation-delay: 0.4s;"></div></div>
+
+                <div class="split-container">
+                    <div class="split-line-top"></div>
+                    <div class="split-vert-top" style="left: 0;"></div>
+                    <div class="split-vert-top" style="right: 0;"></div>
+                    
+                    <div class="pipe-node" style="border-left: 3px solid #00b4d8; width: 320px;">
+                        <i class="fas fa-bolt" style="color: #00b4d8;"></i>
+                        <h4>XGBoost Classifier</h4>
+                        <p>Supervised. Extremely fast detection of known Resource Theft logic.</p>
+                    </div>
+                    <div class="pipe-node" style="border-left: 3px solid #7b61ff; width: 320px;">
+                        <i class="fas fa-brain" style="color: #7b61ff;"></i>
+                        <h4>Isolation Forest</h4>
+                        <p>Unsupervised. Catches Zero-Day anomalies & stealthy Side-Channels.</p>
+                    </div>
+
+                    <div class="split-line-bot"></div>
+                    <div class="split-vert-bot" style="left: 0;"></div>
+                    <div class="split-vert-bot" style="right: 0;"></div>
+                    <div class="split-vert-bot" style="left: 50%; height: 20px; background:transparent;"></div> 
+                </div>
+
+                <div class="pipe-connector-v"><div class="pipe-pulse" style="background:#ff3860; box-shadow: 0 0 10px #ff3860; animation-delay: 0.8s;"></div></div>
+
+                <div class="pipe-node" style="border-bottom: 3px solid #23d160;">
+                    <i class="fas fa-shield-halved" style="color: #23d160;"></i>
+                    <h4>SMF Executive API</h4>
+                    <p>Automated PDU Quarantine. Drops attacker IDs instantly while preserving innocent slice traffic.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- ========== ATTACK EXPLANATION ========== -->
 <section class="attack-section" id="attacks">
     <div class="container">
@@ -276,83 +355,6 @@
                 <div class="step-number">5</div>
                 <h4>Impact</h4>
                 <p>The compromised URLLC slice experiences latency spikes, potentially causing autonomous vehicle failures, surgical robot malfunctions, or industrial control disruptions.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ========== DETECTION ========== -->
-<section class="detection-section" id="detection">
-    <div class="container">
-        <div class="reveal">
-            <span class="section-label">Defense Engine</span>
-            <h2 class="section-title">SliceGuard IDS Architecture</h2>
-            <p class="section-subtitle">
-                SliceGuard implements a multi-layered intrusion detection pipeline that correlates signals 
-                across slices to identify and auto-quarantine threats before they propagate.
-            </p>
-        </div>
-
-        <!-- Real vs Concept Callout -->
-        <div class="glass-card reveal" style="margin-bottom: 40px; border-left: 3px solid var(--urllc-color); padding: 24px 28px;">
-            <h4 style="color: var(--urllc-color); margin-bottom: 8px; font-size: 0.95rem;"><i class="fas fa-globe"></i> Is SliceGuard a Real Product?</h4>
-            <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.7; margin: 0;">
-                "SliceGuard" is an educational prototype built for this presentation, but the <strong>technology is real</strong>. It acts as a conceptual implementation of the 3GPP <strong>NWDAF (Network Data Analytics Function)</strong>—a standard 5G core component that gathers telemetry and uses ML to provide predictive network analytics. It adopts state-of-the-art anomaly-based cross-slice intrusion detection strategies from recent academic research, mimicking enterprise-grade 5G security appliances.
-            </p>
-        </div>
-        
-        <!-- Lifecycle Callout -->
-        <div class="glass-card reveal" style="margin-bottom: 40px; padding: 24px 28px; background: rgba(10,12,16,0.3);">
-            <h4 style="color: var(--text-primary); margin-bottom: 20px; font-size: 1.1rem; text-align: center;">The Automated Guarding Lifecycle</h4>
-            <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; text-align: center;">
-                <div style="flex: 1; min-width: 140px;">
-                    <div style="color: var(--accent); font-size: 1.8rem; margin-bottom: 10px;"><i class="fas fa-eye"></i></div>
-                    <strong style="display:block; margin-bottom: 6px;">1. Observe</strong>
-                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Ingests UPF telemetry.</div>
-                </div>
-                <div style="flex: 1; min-width: 140px;">
-                    <div style="color: var(--danger); font-size: 1.8rem; margin-bottom: 10px;"><i class="fas fa-microchip"></i></div>
-                    <strong style="display:block; margin-bottom: 6px;">2. Detect</strong>
-                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Flags resource spikes.</div>
-                </div>
-                <div style="flex: 1; min-width: 140px;">
-                    <div style="color: var(--warning); font-size: 1.8rem; margin-bottom: 10px;"><i class="fas fa-link"></i></div>
-                    <strong style="display:block; margin-bottom: 6px;">3. Correlate</strong>
-                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Links mMTC to URLLC lag.</div>
-                </div>
-                <div style="flex: 1; min-width: 140px;">
-                    <div style="color: var(--urllc-color); font-size: 1.8rem; margin-bottom: 10px;"><i class="fas fa-lock"></i></div>
-                    <strong style="display:block; margin-bottom: 6px;">4. Isolate</strong>
-                    <div style="font-size: 0.85rem; color: var(--text-secondary);">SMF drops attacker.</div>
-                </div>
-                <div style="flex: 1; min-width: 140px;">
-                    <div style="color: var(--mmtc-color); font-size: 1.8rem; margin-bottom: 10px;"><i class="fas fa-heart-pulse"></i></div>
-                    <strong style="display:block; margin-bottom: 6px;">5. Restore</strong>
-                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Yields safe sub-1ms.</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="detection-grid">
-            <div class="detection-card reveal">
-                <div class="det-icon"><i class="fas fa-chart-line"></i></div>
-                <h4>Behavioral Baseline Engine</h4>
-                <p>SliceGuard continuously profiles each slice's traffic baseline. Z-score and IQR-based detectors flag deviations in throughput, packet size distribution, and inter-arrival times.</p>
-            </div>
-            <div class="detection-card reveal">
-                <div class="det-icon"><i class="fas fa-gauge-high"></i></div>
-                <h4>Resource Contention Monitor</h4>
-                <p>Per-slice CPU, memory, and bandwidth telemetry is sampled every 100ms. Cross-correlation detects when one slice's spike coincides with another's degradation — a contention attack signature.</p>
-            </div>
-            <div class="detection-card reveal">
-                <div class="det-icon"><i class="fas fa-magnifying-glass-chart"></i></div>
-                <h4>Inter-Slice Boundary Guards</h4>
-                <p>Deep packet inspection at slice boundaries detects unauthorized cross-slice communication. Any packet crossing a boundary without proper authorization is flagged.</p>
-            </div>
-            <div class="detection-card reveal">
-                <div class="det-icon"><i class="fas fa-brain"></i></div>
-                <h4>Adaptive ML Classifier</h4>
-                <p>An Isolation Forest model trained on normal slice telemetry detects subtle attack signatures invisible to rules — including cache-timing side-channels and covert resource exfiltration.</p>
             </div>
         </div>
     </div>
