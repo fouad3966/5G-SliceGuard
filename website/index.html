@@ -23,7 +23,7 @@
         </a>
         <ul class="nav-links" id="navLinks">
             <li><a href="#about">About</a></li>
-            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#highway">Defense Mechanism</a></li>
             <li><a href="#simulator">Defense Lab</a></li>
             <li><a href="#attacks">Threat Landscape</a></li>
             <li><a href="#detection">Defense Engine</a></li>
@@ -168,241 +168,72 @@
     </div>
 </section>
 
-<!-- ========== ARCHITECTURE ========== -->
-<section class="architecture-section" id="architecture">
+<!-- ========== DEFENSE MECHANISM (THE HIGHWAY) ========== -->
+<section class="highway-section" id="highway" style="padding: 100px 0; background-color: var(--bg-alt);">
     <div class="container">
         <div class="reveal">
-            <span class="section-label">Architecture</span>
-            <h2 class="section-title">5G Slicing Architecture</h2>
+            <span class="section-label">Defense Mechanism</span>
+            <h2 class="section-title">The "Highway" Analogy: How SliceGuard Operates</h2>
             <p class="section-subtitle">
-                Network slicing operates across all layers of the 5G architecture — from the Radio Access Network 
-                through the Core Network, managed by the NSSF (Network Slice Selection Function).
+                A 5G Network is a massive highway. Slices are dedicated lanes, and PDU Sessions are the individual cars. 
+                Watch how our ML Engine identifies and quarantines rogue vehicles without shutting down the entire infrastructure.
             </p>
         </div>
 
-        <div class="arch-diagram reveal">
-            <div class="arch-layers">
-                <!-- Application Layer -->
-                <div class="arch-layer">
-                    <div class="arch-layer-label">Application Layer</div>
-                    <div class="arch-layer-content">
-                        <div class="arch-node embb-node"><i class="fas fa-film"></i> <div><strong>VR / Streaming</strong><small class="arch-desc">4K video, cloud gaming, AR</small></div></div>
-                        <div class="arch-node urllc-node"><i class="fas fa-robot"></i> <div><strong>Autonomous Systems</strong><small class="arch-desc">Self-driving, remote surgery</small></div></div>
-                        <div class="arch-node mmtc-node"><i class="fas fa-temperature-half"></i> <div><strong>IoT Sensors</strong><small class="arch-desc">Smart city, agriculture, env.</small></div></div>
-                    </div>
-                </div>
-
-                <div class="arch-connector"><i class="fas fa-arrows-down-to-line"></i> <span style="margin-left:8px; font-style:italic;">S-NSSAI routing</span></div>
-
-                <!-- Slice Management -->
-                <div class="arch-layer">
-                    <div class="arch-layer-label">Slice Management</div>
-                    <div class="arch-layer-content">
-                        <div class="arch-node"><i class="fas fa-network-wired"></i> <div><strong>NSSF</strong><small class="arch-desc">Network Slice Selection Function — decides which slice a device connects to</small></div></div>
-                        <div class="arch-node"><i class="fas fa-shield-halved"></i> <div><strong>NSSAAF</strong><small class="arch-desc">Slice Auth & Authorization — verifies per-slice access rights</small></div></div>
-                        <div class="arch-node"><i class="fas fa-gauge-high"></i> <div><strong>NSSMF</strong><small class="arch-desc">Slice Subnet Mgmt — monitors & manages each slice's health</small></div></div>
-                    </div>
-                </div>
-
-                <div class="arch-connector"><i class="fas fa-arrows-down-to-line"></i> <span style="margin-left:8px; font-style:italic;">Control plane</span></div>
-
-                <!-- Core Network -->
-                <div class="arch-layer">
-                    <div class="arch-layer-label">5G Core (5GC)</div>
-                    <div class="arch-layer-content">
-                        <div class="arch-node"><i class="fas fa-server"></i> <div><strong>AMF</strong><small class="arch-desc">Access & Mobility Mgmt — device registration & handovers</small></div></div>
-                        <div class="arch-node"><i class="fas fa-database"></i> <div><strong>UDM</strong><small class="arch-desc">Unified Data Mgmt — subscriber profiles & slice assignments</small></div></div>
-                        <div class="arch-node"><i class="fas fa-route"></i> <div><strong>SMF</strong><small class="arch-desc">Session Mgmt — manages data sessions within each slice</small></div></div>
-                        <div class="arch-node"><i class="fas fa-globe"></i> <div><strong>UPF</strong><small class="arch-desc">User Plane Function — forwards actual data packets (shared = risk!)</small></div></div>
-                    </div>
-                </div>
-
-                <div class="arch-connector"><i class="fas fa-arrows-down-to-line"></i> <span style="margin-left:8px; font-style:italic;">Fronthaul / midhaul</span></div>
-
-                <!-- RAN -->
-                <div class="arch-layer">
-                    <div class="arch-layer-label">Radio Access (RAN)</div>
-                    <div class="arch-layer-content">
-                        <div class="arch-node"><i class="fas fa-broadcast-tower"></i> <div><strong>gNodeB (gNB)</strong><small class="arch-desc">5G Base Station — the radio tower devices connect to (replaces 4G's eNodeB)</small></div></div>
-                        <div class="arch-node"><i class="fas fa-tower-cell"></i> <div><strong>gNodeB (gNB)</strong><small class="arch-desc">Multiple gNBs provide coverage and handle capacity across areas</small></div></div>
-                        <div class="arch-node"><i class="fas fa-satellite-dish"></i> <div><strong>gNodeB (gNB)</strong><small class="arch-desc">Each gNB can serve multiple slices simultaneously over air</small></div></div>
-                    </div>
-                </div>
-
-                <div class="arch-connector"><i class="fas fa-arrows-down-to-line"></i> <span style="margin-left:8px; font-style:italic;">NR air interface</span></div>
-
-                <!-- UE -->
-                <div class="arch-layer">
-                    <div class="arch-layer-label">User Equipment</div>
-                    <div class="arch-layer-content">
-                        <div class="arch-node embb-node"><i class="fas fa-mobile-screen"></i> <div><strong>Smartphones</strong><small class="arch-desc">Request eMBB slice via S-NSSAI in registration</small></div></div>
-                        <div class="arch-node urllc-node"><i class="fas fa-car-side"></i> <div><strong>Vehicles</strong><small class="arch-desc">Require guaranteed URLLC slice for safety-critical comms</small></div></div>
-                        <div class="arch-node mmtc-node"><i class="fas fa-microchip"></i> <div><strong>IoT Devices</strong><small class="arch-desc">Low-power devices on mMTC slice, often low security</small></div></div>
-                    </div>
+        <div class="highway-interactive-wrapper reveal" style="display: flex; gap: 40px; margin-top: 40px; flex-wrap: wrap;">
+            <!-- Left: Interactive Canvas -->
+            <div class="highway-canvas-area" style="flex: 1.5; min-width: 400px; display:flex; flex-direction:column; gap:16px;">
+                <canvas id="highwayCanvas" style="width: 100%; height: 400px; background: #0a0c10; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);"></canvas>
+                <div class="highway-controls" style="display: flex; gap: 12px; justify-content: center;">
+                    <button class="sim-btn" style="background: rgba(255,255,255,0.05); color:white; flex:1;" onclick="hwySim.setMode('normal')"><i class="fas fa-car-side"></i> Normal Traffic</button>
+                    <button class="sim-btn danger" style="flex:1;" onclick="hwySim.setMode('attack')"><i class="fas fa-biohazard"></i> Inject Zombies</button>
+                    <button class="sim-btn success" style="flex:1;" onclick="hwySim.setMode('quarantine')"><i class="fas fa-shield-halved"></i> SMF Quarantine</button>
                 </div>
             </div>
-
-            <!-- S-NSSAI Explainer -->
-            <div style="margin-top: 24px; padding: 16px 20px; background: rgba(123,97,255,0.06); border: 1px solid rgba(123,97,255,0.15); border-radius: 12px;">
-                <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem; line-height: 1.7;">
-                    <strong style="color: var(--accent);"><i class="fas fa-key"></i> S-NSSAI</strong> (Single Network Slice Selection Assistance Information) — 
-                    Each device specifies which slice it needs using <strong>SST</strong> (Slice Type: 1=eMBB, 2=URLLC, 3=mMTC) and an optional 
-                    <strong>SD</strong> (Slice Differentiator). The NSSF routes the device to the correct virtual network based on this identifier.
-                </p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ========== SIMULATOR ========== -->
-<section class="simulator-section" id="simulator">
-    <div class="container">
-        <div class="simulator-header reveal">
-            <span class="section-label">Defense Lab</span>
-            <h2 class="section-title">Threat Simulation & Response Testbed</h2>
-            <p class="section-subtitle" style="margin: 0 auto;">
-                Observe network slices under normal operation, inject controlled threats to stress-test 
-                isolation boundaries, and validate the IDS engine's detection and automated response capabilities.
-            </p>
-        </div>
-
-        <div class="simulator-wrapper">
-            <!-- Canvas Area -->
-            <div class="sim-canvas-container" id="simCanvasContainer">
-                <div class="sim-status-bar">
-                    <div class="sim-status-badge idle" id="simStatusBadge">
-                        <i class="fas fa-circle"></i> <span>IDLE</span>
+            
+            <!-- Right: The ML IDS Features -->
+            <div class="highway-features" style="flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 20px;">
+                <h4 style="margin-bottom: 5px; color: var(--text-primary); font-size: 1.1rem;"><i class="fas fa-microchip"></i> What the ML IDS is Monitoring</h4>
+                
+                <div class="feature-item" style="display:flex; gap:16px; align-items:flex-start;">
+                    <div class="feat-icon" style="color: var(--accent); font-size: 1.4rem; padding-top:2px;"><i class="fas fa-network-wired"></i></div>
+                    <div class="feat-text">
+                        <strong style="display:block; color:#fff; font-size: 0.95rem; margin-bottom:4px;">1. Volumetric Features</strong>
+                        <p style="color:var(--text-secondary); margin:0; font-size: 0.85rem; line-height:1.5;">Total bandwidth (Mbps) and Packet Rate (pps). Spots brute-force floods.</p>
                     </div>
-                    <div class="sim-timer" id="simTimer">00:00</div>
                 </div>
-                <canvas id="simCanvas"></canvas>
-            </div>
-
-            <!-- Control Panel -->
-            <div class="sim-controls">
-                <!-- Playback -->
-                <div class="control-card">
-                    <h4><i class="fas fa-gamepad"></i> Controls</h4>
-                    <div class="control-btns">
-                        <button class="sim-btn" id="btnStart" onclick="simulator.start()">
-                            <i class="fas fa-play"></i> Start
-                        </button>
-                        <button class="sim-btn" id="btnStop" onclick="simulator.stop()" disabled>
-                            <i class="fas fa-pause"></i> Stop
-                        </button>
-                        <button class="sim-btn" id="btnReset" onclick="simulator.reset()">
-                            <i class="fas fa-rotate-right"></i> Reset
-                        </button>
+                
+                <div class="feature-item" style="display:flex; gap:16px; align-items:flex-start;">
+                    <div class="feat-icon" style="color: var(--embb-color); font-size: 1.4rem; padding-top:2px;"><i class="fas fa-server"></i></div>
+                    <div class="feat-text">
+                        <strong style="display:block; color:#fff; font-size: 0.95rem; margin-bottom:4px;">2. Infrastructure Status</strong>
+                        <p style="color:var(--text-secondary); margin:0; font-size: 0.85rem; line-height:1.5;">CPU and Memory usage of the UPF virtual machines.</p>
                     </div>
                 </div>
 
-                <!-- Attack Options -->
-                <div class="control-card">
-                    <h4><i class="fas fa-flask"></i> Threat Injection</h4>
-                    <div class="attack-types" id="attackTypes">
-                        <label class="attack-option selected">
-                            <input type="radio" name="attackType" value="resource_theft" checked>
-                            <div>
-                                <span class="attack-name">Resource Theft</span>
-                                <span class="attack-desc">Steal bandwidth from adjacent slices</span>
-                            </div>
-                        </label>
-                        <label class="attack-option">
-                            <input type="radio" name="attackType" value="data_injection">
-                            <div>
-                                <span class="attack-name">Data Injection</span>
-                                <span class="attack-desc">Inject packets across slice boundary</span>
-                            </div>
-                        </label>
-                        <label class="attack-option">
-                            <input type="radio" name="attackType" value="side_channel">
-                            <div>
-                                <span class="attack-name">Side-Channel</span>
-                                <span class="attack-desc">Infer data via shared resources</span>
-                            </div>
-                        </label>
-                    </div>
-                    <div class="control-btns" style="margin-top: 12px;">
-                        <button class="sim-btn danger" id="btnAttack" onclick="simulator.launchAttack()" disabled>
-                            <i class="fas fa-flask"></i> Inject Threat
-                        </button>
-                        <button class="sim-btn success" id="btnDetect" onclick="simulator.runDetection()" disabled>
-                            <i class="fas fa-shield-halved"></i> Engage IDS
-                        </button>
+                <div class="feature-item" style="display:flex; gap:16px; align-items:flex-start;">
+                    <div class="feat-icon" style="color: var(--urllc-color); font-size: 1.4rem; padding-top:2px;"><i class="fas fa-tower-broadcast"></i></div>
+                    <div class="feat-text">
+                        <strong style="display:block; color:#fff; font-size: 0.95rem; margin-bottom:4px;">3. QoS Degradation</strong>
+                        <p style="color:var(--text-secondary); margin:0; font-size: 0.85rem; line-height:1.5;">Latency, Jitter, and Drops. Critical for ensuring URLLC slices don't crash.</p>
                     </div>
                 </div>
 
-                <!-- Live Metrics -->
-                <div class="control-card">
-                    <h4><i class="fas fa-chart-bar"></i> Slice Metrics</h4>
-                    <div class="slice-metrics" id="sliceMetrics">
-                        <div class="metric-row">
-                            <span class="metric-label"><span class="metric-dot" style="background:var(--embb-color)"></span> eMBB</span>
-                            <span class="metric-value" id="metricEmbb" style="color:var(--embb-color)">— Mbps</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label"><span class="metric-dot" style="background:var(--urllc-color)"></span> URLLC</span>
-                            <span class="metric-value" id="metricUrllc" style="color:var(--urllc-color)">— ms</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label"><span class="metric-dot" style="background:var(--mmtc-color)"></span> mMTC</span>
-                            <span class="metric-value" id="metricMmtc" style="color:var(--mmtc-color)">— dev</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label"><span class="metric-dot" style="background:var(--danger)"></span> Anomaly</span>
-                            <span class="metric-value" id="metricAnomaly" style="color:var(--danger)">0%</span>
-                        </div>
+                <div class="feature-item" style="display:flex; gap:16px; align-items:flex-start;">
+                    <div class="feat-icon" style="color: var(--mmtc-color); font-size: 1.4rem; padding-top:2px;"><i class="fas fa-link"></i></div>
+                    <div class="feat-text">
+                        <strong style="display:block; color:#fff; font-size: 0.95rem; margin-bottom:4px;">4. Cross-Slice Correlation</strong>
+                        <p style="color:var(--text-secondary); margin:0; font-size: 0.85rem; line-height:1.5;">Analyses a 10-second rolling correlation: if mMTC CPU spikes exactly when URLLC latency spikes, it proves a physical hypervisor attack.</p>
                     </div>
                 </div>
-
-                <!-- Alert Log -->
-                <div class="control-card" style="flex:1; min-height:120px;">
-                    <h4><i class="fas fa-bell"></i> Alert Log</h4>
-                    <div class="alert-log" id="alertLog">
-                        <div class="alert-entry" style="color: var(--text-muted); border-color: var(--border-glass); background: transparent;">
-                            <i class="fas fa-info-circle"></i> Waiting for simulation...
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- NARRATION PANEL -->
-        <div class="narration-panel glass-card" id="narrationPanel" style="margin-top: 24px; margin-bottom: 24px; padding: 20px 28px; border-left: 3px solid var(--accent);">
-            <div style="display: flex; align-items: flex-start; gap: 14px;">
-                <div style="min-width: 40px; height: 40px; border-radius: 10px; background: rgba(123,97,255,0.15); display:flex; align-items:center; justify-content:center;">
-                    <i class="fas fa-comment-dots" style="color: var(--accent); font-size: 1.1rem;" id="narrationIcon"></i>
-                </div>
-                <div style="flex:1;">
-                    <h4 style="font-size: 0.82rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 6px;" id="narrationTitle">What's Happening</h4>
-                    <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; margin: 0;" id="narrationText">
-                        Press <strong>Start</strong> to activate SliceGuard's monitoring system. The canvas shows 3 isolated network slices running on shared infrastructure: 
-                        <strong style="color: var(--embb-color);">eMBB</strong> (streaming — blue packets), 
-                        <strong style="color: var(--urllc-color);">URLLC</strong> (critical systems — red packets), and 
-                        <strong style="color: var(--mmtc-color);">mMTC</strong> (IoT sensors — green packets). 
-                        Each lane represents a virtual slice with its own guaranteed QoS.
+                
+                <div class="quarantine-box glass-card" style="margin-top: 10px; padding: 16px 20px; border-left: 3px solid var(--success);">
+                    <h5 style="color: var(--success); margin-bottom: 8px; font-size: 0.9rem;"><i class="fas fa-bolt"></i> The Scalpel, Not The Shield</h5>
+                    <p style="color: var(--text-secondary); margin:0; font-size: 0.82rem; line-height:1.6;">
+                        When flagged, the ML doesn't shut down the whole mMTC lane. It commands the <strong>SMF (Session Management Function)</strong> to target only rogue <em>PDU Sessions</em>. 
+                        The attacker is dropped, but innocent cars keep driving safely.
                     </p>
                 </div>
-            </div>
-        </div>
-
-        <!-- Charts -->
-        <div class="charts-row">
-            <div class="chart-card">
-                <h5><i class="fas fa-wave-square"></i> Throughput</h5>
-                <canvas id="chartThroughput"></canvas>
-            </div>
-            <div class="chart-card">
-                <h5><i class="fas fa-clock"></i> Latency</h5>
-                <canvas id="chartLatency"></canvas>
-            </div>
-            <div class="chart-card">
-                <h5><i class="fas fa-triangle-exclamation"></i> Threat Level</h5>
-                <canvas id="chartAnomaly"></canvas>
-            </div>
-            <div class="chart-card">
-                <h5><i class="fas fa-chart-pie"></i> Traffic Distribution</h5>
-                <canvas id="chartDistribution"></canvas>
             </div>
         </div>
     </div>
@@ -610,6 +441,161 @@
     </div>
 </section>
 
+<!-- ========== SIMULATOR ========== -->
+<section class="simulator-section" id="simulator">
+    <div class="container">
+        <div class="simulator-header reveal">
+            <span class="section-label">Defense Lab</span>
+            <h2 class="section-title">Threat Simulation & Response Testbed</h2>
+            <p class="section-subtitle" style="margin: 0 auto;">
+                Observe network slices under normal operation, inject controlled threats to stress-test 
+                isolation boundaries, and validate the IDS engine's detection and automated response capabilities.
+            </p>
+        </div>
+
+        <div class="simulator-wrapper">
+            <!-- Canvas Area -->
+            <div class="sim-canvas-container" id="simCanvasContainer">
+                <div class="sim-status-bar">
+                    <div class="sim-status-badge idle" id="simStatusBadge">
+                        <i class="fas fa-circle"></i> <span>IDLE</span>
+                    </div>
+                    <div class="sim-timer" id="simTimer">00:00</div>
+                </div>
+                <canvas id="simCanvas"></canvas>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="sim-controls">
+                <!-- Playback -->
+                <div class="control-card">
+                    <h4><i class="fas fa-gamepad"></i> Controls</h4>
+                    <div class="control-btns">
+                        <button class="sim-btn" id="btnStart" onclick="simulator.start()">
+                            <i class="fas fa-play"></i> Start
+                        </button>
+                        <button class="sim-btn" id="btnStop" onclick="simulator.stop()" disabled>
+                            <i class="fas fa-pause"></i> Stop
+                        </button>
+                        <button class="sim-btn" id="btnReset" onclick="simulator.reset()">
+                            <i class="fas fa-rotate-right"></i> Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Attack Options -->
+                <div class="control-card">
+                    <h4><i class="fas fa-flask"></i> Threat Injection</h4>
+                    <div class="attack-types" id="attackTypes">
+                        <label class="attack-option selected">
+                            <input type="radio" name="attackType" value="resource_theft" checked>
+                            <div>
+                                <span class="attack-name">Resource Theft</span>
+                                <span class="attack-desc">Steal bandwidth from adjacent slices</span>
+                            </div>
+                        </label>
+                        <label class="attack-option">
+                            <input type="radio" name="attackType" value="data_injection">
+                            <div>
+                                <span class="attack-name">Data Injection</span>
+                                <span class="attack-desc">Inject packets across slice boundary</span>
+                            </div>
+                        </label>
+                        <label class="attack-option">
+                            <input type="radio" name="attackType" value="side_channel">
+                            <div>
+                                <span class="attack-name">Side-Channel</span>
+                                <span class="attack-desc">Infer data via shared resources</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="control-btns" style="margin-top: 12px;">
+                        <button class="sim-btn danger" id="btnAttack" onclick="simulator.launchAttack()" disabled>
+                            <i class="fas fa-flask"></i> Inject Threat
+                        </button>
+                        <button class="sim-btn success" id="btnDetect" onclick="simulator.runDetection()" disabled>
+                            <i class="fas fa-shield-halved"></i> Engage IDS
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Metrics -->
+                <div class="control-card">
+                    <h4><i class="fas fa-chart-bar"></i> Slice Metrics</h4>
+                    <div class="slice-metrics" id="sliceMetrics">
+                        <div class="metric-row">
+                            <span class="metric-label"><span class="metric-dot" style="background:var(--embb-color)"></span> eMBB</span>
+                            <span class="metric-value" id="metricEmbb" style="color:var(--embb-color)">— Mbps</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label"><span class="metric-dot" style="background:var(--urllc-color)"></span> URLLC</span>
+                            <span class="metric-value" id="metricUrllc" style="color:var(--urllc-color)">— ms</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label"><span class="metric-dot" style="background:var(--mmtc-color)"></span> mMTC</span>
+                            <span class="metric-value" id="metricMmtc" style="color:var(--mmtc-color)">— dev</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label"><span class="metric-dot" style="background:var(--danger)"></span> Anomaly</span>
+                            <span class="metric-value" id="metricAnomaly" style="color:var(--danger)">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alert Log -->
+                <div class="control-card" style="flex:1; min-height:120px;">
+                    <h4><i class="fas fa-bell"></i> Alert Log</h4>
+                    <div class="alert-log" id="alertLog">
+                        <div class="alert-entry" style="color: var(--text-muted); border-color: var(--border-glass); background: transparent;">
+                            <i class="fas fa-info-circle"></i> Waiting for simulation...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NARRATION PANEL -->
+        <div class="narration-panel glass-card" id="narrationPanel" style="margin-top: 24px; margin-bottom: 24px; padding: 20px 28px; border-left: 3px solid var(--accent);">
+            <div style="display: flex; align-items: flex-start; gap: 14px;">
+                <div style="min-width: 40px; height: 40px; border-radius: 10px; background: rgba(123,97,255,0.15); display:flex; align-items:center; justify-content:center;">
+                    <i class="fas fa-comment-dots" style="color: var(--accent); font-size: 1.1rem;" id="narrationIcon"></i>
+                </div>
+                <div style="flex:1;">
+                    <h4 style="font-size: 0.82rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 6px;" id="narrationTitle">What's Happening</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; margin: 0;" id="narrationText">
+                        Press <strong>Start</strong> to activate SliceGuard's monitoring system. The canvas shows 3 isolated network slices running on shared infrastructure: 
+                        <strong style="color: var(--embb-color);">eMBB</strong> (streaming — blue packets), 
+                        <strong style="color: var(--urllc-color);">URLLC</strong> (critical systems — red packets), and 
+                        <strong style="color: var(--mmtc-color);">mMTC</strong> (IoT sensors — green packets). 
+                        Each lane represents a virtual slice with its own guaranteed QoS.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-row">
+            <div class="chart-card">
+                <h5><i class="fas fa-wave-square"></i> Throughput</h5>
+                <canvas id="chartThroughput"></canvas>
+            </div>
+            <div class="chart-card">
+                <h5><i class="fas fa-clock"></i> Latency</h5>
+                <canvas id="chartLatency"></canvas>
+            </div>
+            <div class="chart-card">
+                <h5><i class="fas fa-triangle-exclamation"></i> Threat Level</h5>
+                <canvas id="chartAnomaly"></canvas>
+            </div>
+            <div class="chart-card">
+                <h5><i class="fas fa-chart-pie"></i> Traffic Distribution</h5>
+                <canvas id="chartDistribution"></canvas>
+            </div>
+        </div>
+    </div>
+</section>
+
+
 <!-- ========== TEAM ========== -->
 <section class="team-section" id="team">
     <div class="container">
@@ -644,5 +630,6 @@
 </footer>
 
 <script src="js/app.js"></script>
+<script src="js/highway.js"></script>
 </body>
 </html>
