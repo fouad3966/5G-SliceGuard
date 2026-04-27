@@ -1,6 +1,6 @@
 /**
- * Highway Analogy Animation v2 (Detailed PDU Lanes)
- * 5G Slicing & SMF Quarantine Visualization
+ * Highway Analogy Animation v3
+ * Quarantine destroys zombies then auto-resets to normal
  */
 
 class HighwaySimulator {
@@ -9,18 +9,22 @@ class HighwaySimulator {
         if (!this.canvas) return;
         this.ctx = this.canvas.getContext('2d');
         
-        // Mode: 'normal', 'attack', 'quarantine'
         this.mode = 'normal';
         this.cars = [];
         this.particles = [];
-        this.quarantineWallY = -100;
+        this.quarantineTimer = 0;
         
-        // Main Slices (Lanes)
-        // We will define inner PDU sub-lanes offset from the center
+        // Lane colors for PDU backgrounds
+        this.pduColors = {
+            embb: ['rgba(0,180,216,0.06)', 'rgba(0,180,216,0.03)', 'rgba(0,180,216,0.06)'],
+            urllc: ['rgba(255,0,110,0.06)', 'rgba(255,0,110,0.03)', 'rgba(255,0,110,0.06)'],
+            mmtc: ['rgba(57,255,20,0.06)', 'rgba(57,255,20,0.03)', 'rgba(57,255,20,0.06)']
+        };
+
         this.lanes = [
-            { name: "eMBB", y: 80, speedMultiplier: 1.0, color: "#00b4d8", pduOffsets: [-15, 0, 15] },
-            { name: "URLLC", y: 180, speedMultiplier: 1.5, color: "#ff006e", pduOffsets: [-15, 0, 15] },
-            { name: "mMTC", y: 280, speedMultiplier: 0.6, color: "#39ff14", pduOffsets: [-15, 0, 15] }
+            { name: "eMBB", y: 65, speedMultiplier: 1.0, color: "#00b4d8", pduOffsets: [-18, 0, 18], pduBg: this.pduColors.embb },
+            { name: "URLLC", y: 185, speedMultiplier: 1.5, color: "#ff006e", pduOffsets: [-18, 0, 18], pduBg: this.pduColors.urllc },
+            { name: "mMTC", y: 305, speedMultiplier: 0.6, color: "#39ff14", pduOffsets: [-18, 0, 18], pduBg: this.pduColors.mmtc }
         ];
 
         this.frameCounter = 0;
@@ -35,57 +39,49 @@ class HighwaySimulator {
         if (!this.canvas) return;
         const rect = this.canvas.parentElement.getBoundingClientRect();
         this.canvas.width = rect.width;
-        this.canvas.height = 400; 
+        this.canvas.height = 400;
     }
 
     setMode(newMode) {
-        this.mode = newMode;
         if (newMode === 'quarantine') {
-            this.quarantineWallY = 0;
+            this.mode = 'quarantine';
+            this.quarantineTimer = 120; // ~2 seconds at 60fps then auto-reset
+        } else {
+            this.mode = newMode;
+            this.quarantineTimer = 0;
         }
     }
 
     spawnCars() {
-        // eMBB cars
+        // eMBB
         if (Math.random() < 0.05) this.addCar(0, 'normal');
-        
-        // URLLC cars
+        // URLLC
         if (Math.random() < 0.03) this.addCar(1, 'normal');
-        
-        // mMTC cars
+        // mMTC
         if (this.mode === 'attack') {
-            // Zombie flood ONLY on PDU sub-lanes 1 and 2
-            if (Math.random() < 0.4) {
-                let subLane = Math.random() > 0.5 ? 1 : 2;
-                this.addCar(2, 'zombie', subLane);
-            }
-            // Normal cars keep flowing on PDU sub-lane 0
+            if (Math.random() < 0.35) this.addCar(2, 'zombie', Math.random() > 0.5 ? 1 : 2);
             if (Math.random() < 0.02) this.addCar(2, 'normal', 0);
+        } else if (this.mode === 'quarantine') {
+            // During quarantine, only spawn normal mMTC on PDU-0
+            if (Math.random() < 0.03) this.addCar(2, 'normal', 0);
         } else {
-            // Normal mMTC flowing everywhere
             if (Math.random() < 0.04) this.addCar(2, 'normal');
         }
     }
 
     addCar(laneIndex, type, forcedSubLane = -1) {
         let speed = (Math.random() * 2 + 3) * this.lanes[laneIndex].speedMultiplier;
+        if (this.mode === 'attack' && laneIndex === 1) speed *= 0.2;
         
-        // Simulating Resource Theft: URLLC slows down dramatically during attack
-        if (this.mode === 'attack' && laneIndex === 1) speed *= 0.2; 
-        
-        // Choose sub-lane (PDU tunnel)
         let subLaneIndex = forcedSubLane !== -1 ? forcedSubLane : Math.floor(Math.random() * 3);
         let id = this.nextId++;
         if (this.nextId > 999) this.nextId = 100;
 
         this.cars.push({
-            id: id,
-            x: -40,
+            id, x: -40,
             y: this.lanes[laneIndex].y + this.lanes[laneIndex].pduOffsets[subLaneIndex],
-            lane: laneIndex,
-            subLane: subLaneIndex,
-            type: type, 
-            speed: speed,
+            lane: laneIndex, subLane: subLaneIndex,
+            type, speed,
             width: type === 'zombie' ? 14 : 20,
             height: type === 'zombie' ? 14 : 10,
             color: type === 'zombie' ? '#ff3860' : this.lanes[laneIndex].color,
@@ -93,12 +89,12 @@ class HighwaySimulator {
     }
 
     createExplosion(x, y) {
-        for(let i=0; i<8; i++) {
+        for (let i = 0; i < 10; i++) {
             this.particles.push({
-                x: x, y: y,
-                vx: (Math.random() - 0.5) * 8,
-                vy: (Math.random() - 0.5) * 8,
-                life: 30,
+                x, y,
+                vx: (Math.random() - 0.5) * 10,
+                vy: (Math.random() - 0.5) * 10,
+                life: 35,
                 color: '#ff3860'
             });
         }
@@ -108,24 +104,30 @@ class HighwaySimulator {
         this.frameCounter++;
         this.spawnCars();
 
+        // Quarantine countdown → auto-reset to normal
+        if (this.mode === 'quarantine') {
+            this.quarantineTimer--;
+            if (this.quarantineTimer <= 0) {
+                this.mode = 'normal';
+            }
+        }
+
         for (let i = this.cars.length - 1; i >= 0; i--) {
             let car = this.cars[i];
             
-            // SMF Quarantine active: Destroy zombies on specific sub-lanes
-             if (this.mode === 'quarantine' && car.lane === 2 && (car.subLane === 1 || car.subLane === 2)) {
-                // If it hits the firewall line
-                if (car.x > 140) { 
-                    this.createExplosion(car.x, car.y);
-                    this.cars.splice(i, 1);
-                    continue;
-                }
+            // During quarantine: destroy all zombies
+            if (this.mode === 'quarantine' && car.type === 'zombie') {
+                this.createExplosion(car.x, car.y);
+                this.cars.splice(i, 1);
+                continue;
             }
 
             car.x += car.speed;
             
+            // URLLC speed dynamics
             if (car.lane === 1) {
-                if (this.mode === 'attack' && car.speed > 1) car.speed *= 0.95; 
-                if (this.mode !== 'attack' && car.speed < 3.5) car.speed += 0.1; 
+                if (this.mode === 'attack' && car.speed > 0.8) car.speed *= 0.96;
+                if (this.mode !== 'attack' && car.speed < 3.5) car.speed += 0.08;
             }
 
             if (car.x > this.canvas.width + 50) {
@@ -133,21 +135,13 @@ class HighwaySimulator {
             }
         }
 
-        for (let i = this.particles.length-1; i>=0; i--) {
+        // Particles
+        for (let i = this.particles.length - 1; i >= 0; i--) {
             let p = this.particles[i];
-            p.x += p.vx; p.y += p.vy; p.life--;
-            if(p.life <= 0) this.particles.splice(i, 1);
-        }
-
-        if (this.mode === 'quarantine') {
-            let targetY = this.lanes[2].y + Math.max(...this.lanes[2].pduOffsets) + 10;
-            let startY = this.lanes[2].y + this.lanes[2].pduOffsets[1] - 10;
-            if (this.quarantineWallY < targetY) {
-                if (this.quarantineWallY < startY) this.quarantineWallY = startY;
-                this.quarantineWallY += 10;
-            }
-        } else {
-            this.quarantineWallY = -100;
+            p.x += p.vx; p.y += p.vy;
+            p.vx *= 0.95; p.vy *= 0.95;
+            p.life--;
+            if (p.life <= 0) this.particles.splice(i, 1);
         }
     }
 
@@ -157,66 +151,104 @@ class HighwaySimulator {
         const h = this.canvas.height;
         ctx.clearRect(0, 0, w, h);
 
-        // Draw Legend for IDs
-        ctx.fillStyle = 'rgba(255,255,255,0.4)';
-        ctx.font = '600 11px Inter';
-        ctx.fillText("Legend: Numeric IDs over cars visually represent the tracking of device IPs or SUPIs.", 20, 20);
+        // Background
+        ctx.fillStyle = '#0a0c10';
+        ctx.fillRect(0, 0, w, h);
 
+        // Legend
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        ctx.font = '500 10px Inter';
+        ctx.fillText("Each numbered car represents a PDU session tracked by its IP / SUPI identifier", 15, 16);
+
+        // Draw lanes
         this.lanes.forEach((lane) => {
-            // Highlight background
-            ctx.fillStyle = 'rgba(255,255,255,0.02)';
-            ctx.fillRect(0, lane.y - 40, w, 80);
-
-            // Draw micro-lanes (PDU Sessions)
+            // PDU sub-lane backgrounds with distinct colors
             lane.pduOffsets.forEach((offset, idx) => {
-                ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+                const bgColor = lane.pduBg[idx];
+                ctx.fillStyle = bgColor;
+                ctx.fillRect(0, lane.y + offset - 8, w, 16);
+
+                // PDU lane dotted divider
+                ctx.strokeStyle = lane.color;
+                ctx.globalAlpha = 0.12;
                 ctx.lineWidth = 1;
-                ctx.setLineDash([5, 5]);
+                ctx.setLineDash([4, 6]);
                 ctx.beginPath();
-                ctx.moveTo(0, lane.y + offset);
+                ctx.moveTo(60, lane.y + offset);
                 ctx.lineTo(w, lane.y + offset);
                 ctx.stroke();
                 ctx.setLineDash([]);
+                ctx.globalAlpha = 1;
                 
                 // PDU label
-                ctx.fillStyle = `rgba(255,255,255,0.15)`;
+                ctx.fillStyle = lane.color;
+                ctx.globalAlpha = 0.25;
                 ctx.font = '500 8px JetBrains Mono';
-                ctx.fillText(`PDU-${idx+1}`, 10, lane.y + offset + 3);
+                ctx.fillText(`PDU-${idx + 1}`, 8, lane.y + offset + 3);
+                ctx.globalAlpha = 1;
             });
-            
-            ctx.fillStyle = `rgba(255,255,255,0.5)`;
-            ctx.font = '700 14px Inter';
-            ctx.fillText(lane.name + " Slice", 20, lane.y - 25);
-            
+
+            // Slice name
+            ctx.fillStyle = lane.color;
+            ctx.globalAlpha = 0.6;
+            ctx.font = '700 13px Inter';
+            ctx.fillText(lane.name + " Slice", 15, lane.y - 28);
+            ctx.globalAlpha = 1;
+
+            // Status indicators
             if (lane.name === "URLLC") {
-                ctx.fillStyle = this.mode === 'attack' ? '#ff3860' : '#23d160';
-                ctx.font = '500 11px JetBrains Mono';
-                ctx.fillText(this.mode === 'attack' ? "LATENCY SPIKE! (Cross-Slice Impact)" : "Normal Latency (Sub-1ms)", w - 240, lane.y - 25);
+                ctx.font = '500 10px JetBrains Mono';
+                if (this.mode === 'attack') {
+                    ctx.fillStyle = '#ff3860';
+                    ctx.fillText("⚠ LATENCY SPIKE (Cross-Slice Impact)", w - 260, lane.y - 28);
+                } else {
+                    ctx.fillStyle = '#23d160';
+                    ctx.fillText("✓ Normal (Sub-1ms)", w - 160, lane.y - 28);
+                }
+            }
+            if (lane.name === "mMTC") {
+                ctx.font = '500 10px JetBrains Mono';
+                if (this.mode === 'attack') {
+                    ctx.fillStyle = '#ff3860';
+                    ctx.fillText("⚠ ZOMBIE FLOOD ON PDU-2 & PDU-3", w - 250, lane.y - 28);
+                } else if (this.mode === 'quarantine') {
+                    ctx.fillStyle = '#23d160';
+                    ctx.fillText("🛡 SMF ISOLATING ROGUE PDUs...", w - 230, lane.y - 28);
+                }
+            }
+
+            // Separator between slices
+            if (lane !== this.lanes[this.lanes.length - 1]) {
+                const sepY = lane.y + lane.pduOffsets[2] + 22;
+                ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(0, sepY);
+                ctx.lineTo(w, sepY);
+                ctx.stroke();
             }
         });
 
-        // Draw Quarantine Firewall
+        // Quarantine shield glow on mMTC PDU-2 and PDU-3
         if (this.mode === 'quarantine') {
-            const wallX = 145;
-            const startY = this.lanes[2].y + this.lanes[2].pduOffsets[1] - 8;
-            
-            // Only blocks PDU-2 and PDU-3! PDU-1 is untouched.
-            const glow = ctx.createLinearGradient(wallX, startY, wallX+20, startY);
-            glow.addColorStop(0, 'rgba(35, 209, 96, 0.8)');
-            glow.addColorStop(1, 'transparent');
-            ctx.fillStyle = glow;
-            ctx.fillRect(wallX, startY, 40, 40);
-
+            const mmtc = this.lanes[2];
+            const wallX = 70;
+            [1, 2].forEach(idx => {
+                const pduY = mmtc.y + mmtc.pduOffsets[idx];
+                ctx.fillStyle = 'rgba(35, 209, 96, 0.15)';
+                ctx.fillRect(wallX, pduY - 8, w - wallX, 16);
+            });
+            // Vertical wall line
             ctx.strokeStyle = '#23d160';
-            ctx.lineWidth = 4;
+            ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.moveTo(wallX, startY);
-            ctx.lineTo(wallX, this.quarantineWallY);
+            ctx.moveTo(wallX, mmtc.y + mmtc.pduOffsets[1] - 10);
+            ctx.lineTo(wallX, mmtc.y + mmtc.pduOffsets[2] + 10);
             ctx.stroke();
 
             ctx.fillStyle = '#23d160';
-            ctx.font = '700 12px Inter';
-            ctx.fillText("SMF BLOCKS ONLY TARGET PDUs", wallX-90, startY - 10);
+            ctx.font = '700 10px Inter';
+            ctx.fillText("SMF WALL", wallX - 2, mmtc.y + mmtc.pduOffsets[1] - 14);
         }
 
         // Draw Cars
@@ -225,33 +257,38 @@ class HighwaySimulator {
             if (car.type === 'zombie') {
                 ctx.beginPath();
                 ctx.moveTo(car.x + car.width, car.y);
-                ctx.lineTo(car.x, car.y - car.height/2);
-                ctx.lineTo(car.x, car.y + car.height/2);
+                ctx.lineTo(car.x, car.y - car.height / 2);
+                ctx.lineTo(car.x, car.y + car.height / 2);
                 ctx.fill();
             } else {
-                ctx.fillRect(car.x, car.y - car.height/2, car.width, car.height);
-                ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                ctx.fillRect(car.x + car.width - 2, car.y - car.height/2, 2, car.height);
+                const r = 3;
+                ctx.beginPath();
+                ctx.roundRect(car.x, car.y - car.height / 2, car.width, car.height, r);
+                ctx.fill();
+                // Headlight
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.fillRect(car.x + car.width - 2, car.y - car.height / 2 + 1, 2, car.height - 2);
             }
-            
-            // Draw ID Text
-            ctx.fillStyle = 'rgba(255,255,255,0.7)';
-            ctx.font = '500 8px JetBrains Mono';
-            ctx.fillText(car.id, car.x, car.y - 8);
+            // ID label
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            ctx.font = '500 7px JetBrains Mono';
+            ctx.fillText(car.id, car.x + 2, car.y - car.height / 2 - 3);
         });
 
+        // Explosion particles
         this.particles.forEach(p => {
             ctx.fillStyle = p.color;
-            ctx.globalAlpha = p.life / 30;
+            ctx.globalAlpha = p.life / 35;
             ctx.beginPath();
-            ctx.arc(p.x, p.y, 2, 0, Math.PI*2);
+            ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
             ctx.fill();
-            ctx.globalAlpha = 1.0;
+            ctx.globalAlpha = 1;
         });
-        
+
+        // Attack overlay
         if (this.mode === 'attack') {
             const pulse = (Math.sin(this.frameCounter * 0.05) + 1) * 0.5;
-            ctx.fillStyle = `rgba(255, 56, 96, ${pulse * 0.05})`;
+            ctx.fillStyle = `rgba(255, 56, 96, ${pulse * 0.04})`;
             ctx.fillRect(0, 0, w, h);
         }
     }

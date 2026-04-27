@@ -24,8 +24,8 @@
         </a>
         <ul class="nav-links" id="navLinks">
             <li><a href="#about">About</a></li>
-            <li><a href="#attacks">Threat Landscape</a></li>
             <li><a href="#detection">Defense Pipeline</a></li>
+            <li><a href="#attacks">Threat Landscape</a></li>
             <li><a href="#comparison">Protocols</a></li>
             <li><a href="#simulator" class="nav-cta">Live Demo</a></li>
         </ul>
@@ -167,48 +167,6 @@
     </div>
 </section>
 
-<!-- ========== ATTACK EXPLANATION ========== -->
-<section class="attack-section" id="attacks">
-    <div class="container">
-        <div class="reveal">
-            <span class="section-label">Threat Landscape</span>
-            <h2 class="section-title">Threats SliceGuard Defends Against</h2>
-            <p class="section-subtitle">
-                SliceGuard is built to detect and neutralize threats that exploit shared physical infrastructure 
-                to breach the isolation boundaries between virtualized network slices.
-            </p>
-        </div>
-
-        <div class="attack-flow">
-            <div class="attack-step reveal">
-                <div class="step-number">1</div>
-                <h4>Reconnaissance</h4>
-                <p>The attacker gains access to a low-security slice (e.g., mMTC). They probe the shared infrastructure to identify resource contention points and slice topology information.</p>
-            </div>
-            <div class="attack-step reveal">
-                <div class="step-number">2</div>
-                <h4>Resource Mapping</h4>
-                <p>Using timing side-channels and traffic analysis, the attacker maps shared resources: CPU cores, memory banks, network buffers, and hypervisor interfaces across slices.</p>
-            </div>
-            <div class="attack-step reveal">
-                <div class="step-number">3</div>
-                <h4>Isolation Breach</h4>
-                <p>The attacker exploits vulnerabilities — shared VNF bugs, hypervisor escapes, or API flaws — to cross the slice boundary and access the target slice's resources.</p>
-            </div>
-            <div class="attack-step reveal">
-                <div class="step-number">4</div>
-                <h4>Exploitation</h4>
-                <p>Once across the boundary: steal bandwidth (resource theft), inject malicious packets (data injection), or exfiltrate sensitive data from the critical URLLC slice.</p>
-            </div>
-            <div class="attack-step reveal">
-                <div class="step-number">5</div>
-                <h4>Impact</h4>
-                <p>The compromised URLLC slice experiences latency spikes, potentially causing autonomous vehicle failures, surgical robot malfunctions, or industrial control disruptions.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- ========== DETECTION ========== -->
 <section class="pipeline-timeline-section" id="detection" style="background-color: var(--bg-color); padding: 80px 0;">
     <div class="container">
@@ -255,6 +213,22 @@
                 </div>
                 <div class="pipe-conn-v3"><div class="pipe-pulse-v3" style="animation-delay: 0.4s;"></div></div>
 
+                <!-- THE HIGHWAY CANVAS VISUALIZATION (after IDS positioning) -->
+                <div class="highway-mid-container">
+                    <h5 style="color: var(--accent); font-family: 'JetBrains Mono'; font-size: 14px; margin: 0 0 5px 0; display:flex; align-items:center; justify-content:center;"><i class="fas fa-vial" style="margin-right: 8px;"></i> INTERACTIVE VISUALIZATION: PDU SESSIONS INSIDE A SLICE</h5>
+                    <p style="color: rgba(255,255,255,0.5); font-size: 12px; margin: 0 0 15px 0;">Each slice has multiple PDU sub-lanes. Each car is a device flow tracked by its IP / SUPI. Zombies flood specific PDUs — the SMF firewall targets only those lanes.</p>
+                    <div style="display:flex; flex-direction:column; gap:16px;">
+                        <canvas id="highwayCanvas" style="width: 100%; height: 350px; background: #0a0c10; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);"></canvas>
+                        <div class="highway-controls" style="display: flex; gap: 12px; justify-content: center;">
+                            <button class="sim-btn" style="background: rgba(255,255,255,0.05); color:white; flex:1;" onclick="hwySim.setMode('normal')"><i class="fas fa-car-side"></i> Normal Traffic</button>
+                            <button class="sim-btn danger" style="flex:1;" onclick="hwySim.setMode('attack')"><i class="fas fa-biohazard"></i> Inject Zombies</button>
+                            <button class="sim-btn success" style="flex:1;" onclick="hwySim.setMode('quarantine')"><i class="fas fa-shield-halved"></i> SMF Quarantine</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pipe-conn-v3" style="height: 30px;"><div class="pipe-pulse-v3" style="animation-delay: 0.5s;"></div></div>
+
                 <!-- STEP 3 — Feature Engineering -->
                 <div class="pipe-node-v3" style="border-top: 3px solid var(--warning);">
                     <h4><i class="fas fa-filter" style="color: var(--warning); font-size: 22px;"></i> 3 — Feature Engineering (What the ML "Sees")</h4>
@@ -293,28 +267,54 @@
 
                 <div class="pipe-conn-v3" style="height: 30px;"><div class="pipe-pulse-v3" style="background:#23d160; box-shadow: 0 0 10px #23d160; animation-delay: 1.3s;"></div></div>
 
-                <!-- THE HIGHWAY CANVAS VISUALIZATION -->
-                <div class="highway-mid-container">
-                    <h5 style="color: #23d160; font-family: 'JetBrains Mono'; font-size: 14px; margin: 0 0 5px 0; display:flex; align-items:center; justify-content:center;"><i class="fas fa-vial" style="margin-right: 8px;"></i> INTERACTIVE VISUALIZATION</h5>
-                    <p style="color: rgba(255,255,255,0.5); font-size: 12px; margin: 0 0 15px 0;">Each slice has multiple PDU sub-lanes. Each car is a device flow tracked by its IP / SUPI. Zombies flood specific PDUs — the SMF firewall targets only those lanes.</p>
-                    <div style="display:flex; flex-direction:column; gap:16px;">
-                        <canvas id="highwayCanvas" style="width: 100%; height: 350px; background: #000; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);"></canvas>
-                        <div class="highway-controls" style="display: flex; gap: 12px; justify-content: center;">
-                            <button class="sim-btn" style="background: rgba(255,255,255,0.05); color:white; flex:1;" onclick="hwySim.setMode('normal')"><i class="fas fa-car-side"></i> Normal Traffic</button>
-                            <button class="sim-btn danger" style="flex:1;" onclick="hwySim.setMode('attack')"><i class="fas fa-biohazard"></i> Inject Zombies</button>
-                            <button class="sim-btn success" style="flex:1;" onclick="hwySim.setMode('quarantine')"><i class="fas fa-shield-halved"></i> SMF Quarantine</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pipe-conn-v3" style="height: 30px;"><div class="pipe-pulse-v3" style="background:#23d160; box-shadow: 0 0 10px #23d160; animation-delay: 1.6s;"></div></div>
-
                 <!-- STEP 6 — Restoration -->
                 <div class="pipe-node-v3" style="border-bottom: 3px solid var(--text-primary); margin-bottom: 20px;">
                     <h4><i class="fas fa-heart-pulse" style="color: var(--text-primary); font-size: 22px;"></i> 6 — System Restoration</h4>
                     <p>Malicious traffic physically stops entering the core. The hypervisor CPU buffers drain, the UPF queues clear, and the URLLC slice restores to <strong>sub-1ms latency</strong>. The IDS enters a brief <strong>warmup phase</strong> (clearing rolling windows) before resuming active detection to avoid false positives from residual data.</p>
                 </div>
 
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== ATTACK EXPLANATION ========== -->
+<section class="attack-section" id="attacks">
+    <div class="container">
+        <div class="reveal">
+            <span class="section-label">Threat Landscape</span>
+            <h2 class="section-title">Threats SliceGuard Defends Against</h2>
+            <p class="section-subtitle">
+                SliceGuard is built to detect and neutralize threats that exploit shared physical infrastructure 
+                to breach the isolation boundaries between virtualized network slices.
+            </p>
+        </div>
+
+        <div class="attack-flow">
+            <div class="attack-step reveal">
+                <div class="step-number">1</div>
+                <h4>Reconnaissance</h4>
+                <p>The attacker gains access to a low-security slice (e.g., mMTC). They probe the shared infrastructure to identify resource contention points and slice topology.</p>
+            </div>
+            <div class="attack-step reveal">
+                <div class="step-number">2</div>
+                <h4>Resource Mapping</h4>
+                <p>Using timing side-channels and traffic analysis, the attacker maps shared resources: CPU cores, memory banks, network buffers, and hypervisor interfaces across slices.</p>
+            </div>
+            <div class="attack-step reveal">
+                <div class="step-number">3</div>
+                <h4>Isolation Breach</h4>
+                <p>The attacker exploits vulnerabilities — shared VNF bugs, hypervisor escapes, or API flaws — to cross the slice boundary and access the target slice's resources.</p>
+            </div>
+            <div class="attack-step reveal">
+                <div class="step-number">4</div>
+                <h4>Exploitation</h4>
+                <p>Once across the boundary: steal bandwidth (resource theft), inject malicious packets (data injection), or exfiltrate sensitive data from the critical URLLC slice.</p>
+            </div>
+            <div class="attack-step reveal">
+                <div class="step-number">5</div>
+                <h4>Impact</h4>
+                <p>The compromised URLLC slice experiences latency spikes, potentially causing autonomous vehicle failures, surgical robot malfunctions, or industrial control disruptions.</p>
             </div>
         </div>
     </div>
