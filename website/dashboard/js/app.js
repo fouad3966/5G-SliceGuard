@@ -16,7 +16,7 @@
 // Configuration
 // ══════════════════════════════════════════════════════════════
 
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = window.location.origin + "/api";
 const POLL_INTERVAL = 1000; // 1 second
 const CHART_HISTORY = 50; // data points shown on charts
 
@@ -90,13 +90,16 @@ async function pollData() {
 function updateConnectionBadge(online) {
     const badge = document.getElementById("connection-badge");
     const text = badge.querySelector(".connection-text");
+    const footerPort = document.getElementById("footer-port");
 
     if (online) {
         badge.className = "connection-badge online";
         text.textContent = "⚡ LIVE — Connected to SliceGuard IDS Backend";
+        if (footerPort) footerPort.textContent = `API: ${window.location.host}`;
     } else {
         badge.className = "connection-badge offline";
         text.textContent = "⚠ OFFLINE — Start python simulation/app.py";
+        if (footerPort) footerPort.textContent = "API: disconnected";
     }
 }
 
