@@ -1,0 +1,32 @@
+main paper : https://www.mdpi.com/1424-8220/25/11/3335
+
+
+Common Attack Techniques:
+Side-Channel Attacks: Observing contention on shared resources, such as the ring interconnect in processor chips, to infer secure data.
+Resource Exhaustion: Overwhelming shared resources to cause service failures.
+Identity Deception: Exploiting authentication gaps to steal traffic. 
+Applied Cybersecurity & Internet Governance
+Applied Cybersecurity & Internet Governance
+ +4
+
+
+Countermeasures:
+Robust Isolation: Using strong security measures like dedicated virtual firewalls and network function virtualization (NFV) isolation.
+AI-Driven Detection: Using Artificial Intelligence to detect anomalies.
+Zero-Trust Architecture: Implementing strict verification for inter-slice communication.
+Blockchain Authentication: Securing authentication across different network slices and operators. 
+IEEE
+IEEE
+ +4
+
+
+ https://en.wikipedia.org/wiki/Side-channel_attack
+
+
+
+
+Data Plane (Deep Packet Inspection): AI inspects the actual data payloads in real-time to spot malicious signatures.
+
+Control Plane (SDN + AI): The Software-Defined Networking controller uses AI to look at the "big picture" of traffic routing. If it sees suspicious patterns moving between slices, it dynamically rewrites flow rules to block those specific packets.
+
+Management Plane (NFV): It uses Network Function Virtualization to instantly spin up "virtual firewalls" or Intrusion Detection Systems and drop them exactly where a slice is under attack.
