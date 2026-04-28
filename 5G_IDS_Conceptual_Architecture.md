@@ -66,8 +66,11 @@ In a URLLC environment, human reaction time is fundamentally too slow. If an att
 In the event of an IoT botnet flood, the IDS does *not* shut down the entire mMTC slice, as this would result in a self-inflicted Denial of Service against legitimate users. Instead, it acts like a scalpel:
 1. **Identify Corrupted Flows:** The IDS pinpoints the specific statistical outlier IPs/UEs that are acting like "zombies."
 2. **SBA Integration:** The IDS sends an urgent REST API HTTP POST request over the 5G Service-Based Architecture management bus to the **SMF (Session Management Function)**.
-3. **Terminate PDU Sessions:** It commands the SMF to drop the PDU sessions of exclusively those malicious identifiers. 
-4. **Result:** The UPF immediately blocks the malicious traffic. The 100 attacking devices are kicked off the network, while the 9,900 legitimate devices in the same slice experience zero interruption.
+3. **Terminate PDU Sessions:** It commands the SMF to forcefully terminate the PDU sessions of exclusively those malicious identifiers — not the physical devices themselves. 
+4. **Result:** The UPF immediately blocks the malicious traffic. Dropping an entire session is instantaneous and highly secure. While any legitimate "clean" background packets mixed in that specific session are also dropped (a harsh but necessary measure), avoiding slow packet-by-packet filtering is the only way to save the critical URLLC slice from crashing. Meanwhile, the other 9,900 legitimate devices in the exact same slice experience zero interruption because they have their own independent PDU sessions.
+
+### System Restoration
+Because the malicious PDU sessions are dropped at the SMF level, the flood physically stops entering the core. The hypervisor CPU buffers drain, and the URLLC slice instantly restores to sub-1ms latency. The devices are now disconnected from the data plane. Afterward, the network operator can evaluate whether to permanently blacklist the device's SUPI, or place it in a remediation pool. Once verified clean, the device is allowed to establish a brand new, clean PDU session.
 
 ### The Filter & The Shield (Fallback Logic)
 If the attack uses spoofed IPs (making individual identification impossible), the system relies on fallback logic:
