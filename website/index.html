@@ -259,9 +259,9 @@
                     <h4><i class="fas fa-code" style="color: #23d160; font-size: 22px;"></i> 5 — Automated Quarantine via REST API</h4>
                     <p>Human reaction time is too slow for URLLC. The IDS autonomously executes a <strong>surgical quarantine</strong>:</p>
                     <ul>
-                        <li><strong>The Scalpel:</strong> The IDS pinpoints the specific rogue SUPI/IP identifiers. It sends an HTTP POST via the <strong>5G SBA (Service-Based Architecture)</strong> bus to the <strong>SMF (Session Management Function)</strong>. The SMF commands the UPF to terminate only those specific PDU sessions. The 100 zombie devices are kicked off; the 9,900 legitimate devices experience zero interruption.</li>
-                        <li><strong>The Filter (Fallback):</strong> If attackers spoof IPs, the IDS instructs the UPF to instead drop specific traffic classes (e.g., "Drop all UDP to port 80").</li>
-                        <li><strong>The Shield (Last Resort):</strong> The orchestrator hard-caps the mMTC slice's resources at its SLA limit, physically preventing it from stealing CPU from the URLLC slice.</li>
+                        <li><strong>The Scalpel (Session Termination):</strong> The IDS pinpoints the specific rogue SUPI/IP identifiers. It sends an HTTP POST via the <strong>5G SBA</strong> to the <strong>SMF (Session Management Function)</strong>. The SMF forcefully terminates the misbehaving <strong>PDU sessions</strong> — not the physical devices.</li>
+                        <li><strong>Why PDU Termination?</strong> Dropping an entire session is instantaneous and highly secure. While any legitimate "clean" background packets mixed in that specific session are also dropped (a harsh but necessary measure), avoiding slow packet-by-packet filtering is the only way to save the critical URLLC slice from crashing during a massive flood.</li>
+                        <li><strong>Zero Slice Interruption:</strong> The malicious sessions are terminated instantly, but the other 9,900 legitimate devices in the exact same slice experience zero interruption because they have their own independent PDU sessions.</li>
                     </ul>
                 </div>
 
@@ -270,7 +270,8 @@
                 <!-- STEP 6 — Restoration -->
                 <div class="pipe-node-v3" style="border-bottom: 3px solid var(--text-primary); margin-bottom: 20px;">
                     <h4><i class="fas fa-heart-pulse" style="color: var(--text-primary); font-size: 22px;"></i> 6 — System Restoration</h4>
-                    <p>Malicious traffic physically stops entering the core. The hypervisor CPU buffers drain, the UPF queues clear, and the URLLC slice restores to <strong>sub-1ms latency</strong>. The IDS enters a brief <strong>warmup phase</strong> (clearing rolling windows) before resuming active detection to avoid false positives from residual data.</p>
+                    <p>Because the malicious PDU sessions are dropped at the SMF level, the flood physically stops entering the core. The hypervisor CPU buffers drain, and the URLLC slice is instantly restored to <strong>sub-1ms latency</strong>.</p>
+                    <p style="margin-top: 5px;"><strong>What happens to the terminated sessions?</strong> The devices are now disconnected from the data plane. The network operator can choose to permanently blacklist the device's SUPI, or place it in a remediation pool to be scanned. Once verified clean, the device is allowed to re-attach and establish a brand new, clean PDU session.</p>
                 </div>
 
             </div>
